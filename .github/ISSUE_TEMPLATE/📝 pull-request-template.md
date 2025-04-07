@@ -1,5 +1,5 @@
 ---
-name: pull request template
+name: 📝 pull request template
 about: pull request
 title: "[PR]"
 labels: ''

@@ -1,7 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:rebridge/pages/first_user_reigster_page.dart';
 import '../../pages/login_page.dart';
-import '../../pages/normal_login_page.dart';
 import '../../pages/splash_page.dart';
 import '../../pages/home_page.dart';
 
@@ -18,13 +18,12 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         builder: (context, state) => const LoginPage(),
       ),
       GoRoute(
-        path: '/normallogin',
-        builder: (context, state) => const NormalLoginPage(),
-      ),
-      GoRoute(
         path: '/home',
         builder: (context, state) => const HomePage(),
       ),
+      GoRoute(
+          path: '/firstRegister',
+          builder: (context, state) => const FirstUserRegisterPage())
     ],
   );
 });

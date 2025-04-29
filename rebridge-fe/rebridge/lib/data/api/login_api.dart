@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import '../../shared/providers/auth_provider.dart';
 
 class User {
   final String userId;
@@ -15,22 +17,28 @@ class User {
 
 class LoginApi {
   static final List<User> _fakeUsers = [
-    User(userId: '001', username: 'howeve18@gmail.com', password: '12345678'),
-    User(userId: '002', username: 'butqqt5298@naver.com', password: '12345678'),
-    User(
+    const User(
+        userId: '001', username: 'howeve18@gmail.com', password: '12345678'),
+    const User(
+        userId: '002', username: 'butqqt5298@naver.com', password: '12345678'),
+    const User(
         userId: '003',
         username: 'minsoo030232@gmail.com',
         password: '12345678'),
-    User(userId: '004', username: '5310009@naver.com', password: '12345678'),
-    User(userId: '005', username: 'flutterdev', password: 'flutter123'),
+    const User(
+        userId: '004', username: '5310009@naver.com', password: '12345678'),
+    const User(userId: '005', username: 'flutterdev', password: 'flutter123'),
   ];
 
   static Future<void> normallogin(
-      BuildContext context, String id, String pw) async {
+    BuildContext context,
+    String id,
+    String pw,
+    WidgetRef ref,
+  ) async {
     await Future.delayed(const Duration(milliseconds: 500));
 
     if (id.isEmpty || pw.isEmpty) {
-      // ✅ 아이디 또는 비밀번호가 비어있으면 얼럿 띄우고 종료
       if (!context.mounted) return;
       showDialog(
         context: context,
@@ -45,7 +53,7 @@ class LoginApi {
           ],
         ),
       );
-      return; // 바로 함수 종료
+      return;
     }
 
     try {
@@ -54,6 +62,8 @@ class LoginApi {
         orElse: () => throw Exception('아이디 또는 비밀번호가 일치하지 않습니다.'),
       );
 
+      await ref.read(authProvider.notifier).login();
+      print('[LoginApi] 로그인 성공: $id');
       if (!context.mounted) return;
       showDialog(
         context: context,
@@ -70,6 +80,7 @@ class LoginApi {
       );
       context.go('/home');
     } catch (e) {
+      print('[LoginApi] 로그인 실패: $id / 이유: $e');
       if (!context.mounted) return;
       showDialog(
         context: context,

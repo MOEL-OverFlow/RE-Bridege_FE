@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import '../../shared/utils/dialog_util.dart';
 import '../../shared/providers/auth_provider.dart';
 
 class User {
@@ -40,18 +41,10 @@ class LoginApi {
 
     if (id.isEmpty || pw.isEmpty) {
       if (!context.mounted) return;
-      showDialog(
-        context: context,
-        builder: (context) => AlertDialog(
-          title: const Text('입력 오류'),
-          content: const Text('아이디, 비밀번호를 모두 입력해주세요.'),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(),
-              child: const Text('확인'),
-            ),
-          ],
-        ),
+      DialogUtil.showCustomDialog(
+        context,
+        title: 'Error',
+        content: 'Please enter both your ID and password.',
       );
       return;
     }
@@ -59,41 +52,29 @@ class LoginApi {
     try {
       _fakeUsers.firstWhere(
         (u) => u.username == id && u.password == pw,
-        orElse: () => throw Exception('아이디 또는 비밀번호가 일치하지 않습니다.'),
+        orElse: () => throw Exception('The ID or password does not match.'),
       );
 
       await ref.read(authProvider.notifier).login();
       print('[LoginApi] 로그인 성공: $id');
+
       if (!context.mounted) return;
-      showDialog(
-        context: context,
-        builder: (context) => AlertDialog(
-          title: const Text('로그인 성공'),
-          content: const Text('로그인에 성공하였습니다.'),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(),
-              child: const Text('확인'),
-            ),
-          ],
-        ),
+      DialogUtil.showCustomDialog(
+        context,
+        title: 'Login successful',
+        content: 'Login successful.',
+        onConfirm: () {
+          Navigator.of(context).pop();
+          context.go('/home');
+        },
       );
-      context.go('/home');
     } catch (e) {
       print('[LoginApi] 로그인 실패: $id / 이유: $e');
       if (!context.mounted) return;
-      showDialog(
-        context: context,
-        builder: (context) => AlertDialog(
-          title: const Text('로그인 실패'),
-          content: const Text('아이디 또는 비밀번호가 일치하지 않습니다.'),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(),
-              child: const Text('확인'),
-            ),
-          ],
-        ),
+      DialogUtil.showCustomDialog(
+        context,
+        title: 'Login failed',
+        content: 'The ID or password does not match.',
       );
     }
   }

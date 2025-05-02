@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:rebridge/shared/styles/background_styles.dart';
 import '../../../shared/styles/logo_styles.dart';
 import '../../../data/api/login_api.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -28,7 +29,7 @@ class LoginPageState extends ConsumerState<LoginPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFe9eeff),
+      backgroundColor: BackgroundStyles.backgroundColor,
       body: Center(
         child: SingleChildScrollView(
           child: Padding(
@@ -186,7 +187,9 @@ class LoginPageState extends ConsumerState<LoginPage> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     TextButton(
-                      onPressed: () {},
+                      onPressed: () {
+                        context.go('/findId');
+                      },
                       child: const Text(
                         'Find ID',
                         style: TextStyle(
@@ -202,7 +205,9 @@ class LoginPageState extends ConsumerState<LoginPage> {
                       ),
                     ),
                     TextButton(
-                      onPressed: () {},
+                      onPressed: () {
+                        context.go('/findPw');
+                      },
                       child: const Text(
                         'Find PW',
                         style: TextStyle(
@@ -225,7 +230,7 @@ class LoginPageState extends ConsumerState<LoginPage> {
                     ),
                     TextButton(
                       onPressed: () {
-                        context.go('/firstRegister'); // ✅ 페이지 이동
+                        context.go('/firstRegister');
                       },
                       child: const Text(
                         'Sign Up',

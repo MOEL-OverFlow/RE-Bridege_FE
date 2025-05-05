@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:rebridge/data/api/Find_api.dart';
 import 'package:rebridge/shared/styles/background_styles.dart';
+import 'package:rebridge/shared/styles/device_styles.dart';
+
+import '../shared/styles/button_style.dart';
 
 class FindIdPage extends StatefulWidget {
   const FindIdPage({super.key});
@@ -40,7 +43,10 @@ class _FindIdPageState extends State<FindIdPage> {
       backgroundColor: BackgroundStyles.backgroundColor,
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.all(24.0),
+          padding: EdgeInsets.symmetric(
+            horizontal: DeviceStyles.screenWidth(context) * 0.08,
+            vertical: DeviceStyles.screenHeight(context) * 0.03,
+          ),
           child: Column(
             children: [
               Row(
@@ -51,60 +57,66 @@ class _FindIdPageState extends State<FindIdPage> {
                       context.go('/login');
                     },
                   ),
-                  const Expanded(
+                  Expanded(
                     child: Center(
                       child: Text(
                         'Find ID',
                         style: TextStyle(
-                          fontSize: 24,
+                          fontSize: DeviceStyles.screenWidth(context) * 0.07,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
                     ),
                   ),
-                  const SizedBox(width: 48),
+                  SizedBox(width: DeviceStyles.screenWidth(context) * 0.1),
                 ],
               ),
-              const SizedBox(height: 24),
+              SizedBox(height: DeviceStyles.screenHeight(context) * 0.04),
               Container(
-                padding: const EdgeInsets.all(20),
+                padding: EdgeInsets.symmetric(
+                  horizontal: DeviceStyles.screenWidth(context) * 0.04,
+                  vertical: DeviceStyles.screenHeight(context) * 0.03,
+                ),
                 decoration: BoxDecoration(
                   color: Colors.white,
-                  borderRadius: BorderRadius.circular(20),
+                  borderRadius:
+                      BorderRadius.circular(ButtonStyles.borderradius(context)),
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const Text('Foreigner' ' registration number'),
-                    const SizedBox(height: 8),
+                    SizedBox(height: DeviceStyles.screenHeight(context) * 0.01),
                     TextField(
                       controller: registrationnumberController,
-                      decoration: const InputDecoration(
+                      decoration: InputDecoration(
                         filled: true,
-                        fillColor: Color(0xFFE7EBFF),
+                        fillColor: const Color(0xFFE7EBFF),
                         border: OutlineInputBorder(
-                          borderRadius: BorderRadius.all(Radius.circular(30)),
+                          borderRadius: BorderRadius.all(Radius.circular(
+                              ButtonStyles.borderradius(context))),
                           borderSide: BorderSide.none,
                         ),
                       ),
                     ),
-                    const SizedBox(height: 16),
+                    SizedBox(height: DeviceStyles.screenHeight(context) * 0.02),
                     const Text('Name'),
-                    const SizedBox(height: 8),
+                    SizedBox(height: DeviceStyles.screenHeight(context) * 0.01),
                     TextField(
                       controller: nameController,
-                      decoration: const InputDecoration(
+                      decoration: InputDecoration(
                         filled: true,
-                        fillColor: Color(0xFFE7EBFF),
+                        fillColor: const Color(0xFFE7EBFF),
                         border: OutlineInputBorder(
-                          borderRadius: BorderRadius.all(Radius.circular(30)),
+                          borderRadius: BorderRadius.all(Radius.circular(
+                              ButtonStyles.borderradius(context))),
                           borderSide: BorderSide.none,
                         ),
                       ),
                     ),
-                    const SizedBox(height: 16),
+                    SizedBox(height: DeviceStyles.screenHeight(context) * 0.02),
                     const Text('Country'),
-                    const SizedBox(height: 8),
+                    SizedBox(height: DeviceStyles.screenHeight(context) * 0.01),
                     DropdownButtonFormField<String>(
                       value: selectedCountry,
                       items: countries
@@ -118,27 +130,29 @@ class _FindIdPageState extends State<FindIdPage> {
                           selectedCountry = value;
                         });
                       },
-                      decoration: const InputDecoration(
+                      decoration: InputDecoration(
                         filled: true,
-                        fillColor: Color(0xFFE7EBFF),
+                        fillColor: const Color(0xFFE7EBFF),
                         border: OutlineInputBorder(
-                          borderRadius: BorderRadius.all(Radius.circular(30)),
+                          borderRadius: BorderRadius.all(Radius.circular(
+                              ButtonStyles.borderradius(context))),
                           borderSide: BorderSide.none,
                         ),
                       ),
                     ),
-                    const SizedBox(height: 16),
+                    SizedBox(height: DeviceStyles.screenHeight(context) * 0.02),
                     const Text('Date of Birth'),
-                    const SizedBox(height: 8),
+                    SizedBox(height: DeviceStyles.screenHeight(context) * 0.01),
                     TextField(
                       controller: birthController,
                       readOnly: true,
-                      decoration: const InputDecoration(
-                        suffixIcon: Icon(Icons.calendar_today_outlined),
+                      decoration: InputDecoration(
+                        suffixIcon: const Icon(Icons.calendar_today_outlined),
                         filled: true,
-                        fillColor: Color(0xFFE7EBFF),
+                        fillColor: const Color(0xFFE7EBFF),
                         border: OutlineInputBorder(
-                          borderRadius: BorderRadius.all(Radius.circular(30)),
+                          borderRadius: BorderRadius.all(Radius.circular(
+                              ButtonStyles.borderradius(context))),
                           borderSide: BorderSide.none,
                         ),
                       ),
@@ -157,22 +171,28 @@ class _FindIdPageState extends State<FindIdPage> {
                         }
                       },
                     ),
-                    const SizedBox(height: 40),
+                    SizedBox(height: DeviceStyles.screenHeight(context) * 0.05),
                     SizedBox(
                       width: double.infinity,
                       child: ElevatedButton(
                         onPressed: _findId,
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFF4D65E1),
+                          backgroundColor: ButtonStyles.buttonColor,
                           shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(16),
+                            borderRadius: BorderRadius.circular(
+                                ButtonStyles.borderradius(context)),
                           ),
                         ),
-                        child: const Padding(
-                          padding: EdgeInsets.symmetric(vertical: 14.0),
+                        child: Padding(
+                          padding: EdgeInsets.symmetric(
+                              horizontal: ButtonStyles.paddingwidth(context),
+                              vertical: ButtonStyles.paddingheight(context)),
                           child: Text(
                             'Confirm',
-                            style: TextStyle(fontSize: 16, color: Colors.white),
+                            style: TextStyle(
+                                fontSize:
+                                    DeviceStyles.screenWidth(context) * 0.04,
+                                color: Colors.white),
                           ),
                         ),
                       ),

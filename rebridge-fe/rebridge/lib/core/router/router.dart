@@ -1,8 +1,12 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:rebridge/pages/agree_terms_page.dart';
+import 'package:rebridge/pages/final_user_register_page.dart';
 import 'package:rebridge/pages/find_ID_page.dart';
 import 'package:rebridge/pages/find_PW_page.dart';
 import 'package:rebridge/pages/first_user_reigster_page.dart';
+import 'package:rebridge/pages/membership_guide_page.dart';
+import 'package:rebridge/pages/second_user_register_page.dart';
 import '../../pages/login_page.dart';
 import '../../pages/splash_page.dart';
 import '../../pages/home_page.dart';
@@ -26,8 +30,20 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(path: '/findId', builder: (context, state) => const FindIdPage()),
       GoRoute(path: '/findPw', builder: (context, state) => const FindPWPage()),
       GoRoute(
+          path: '/membershipguide',
+          builder: (context, state) => const MembershipGuidePage()),
+      GoRoute(
+          path: '/agreeterms',
+          builder: (context, state) => const AgreeTermsPage()),
+      GoRoute(
           path: '/firstRegister',
-          builder: (context, state) => const FirstUserRegisterPage())
+          builder: (context, state) => const FirstUserRegisterPage()),
+      GoRoute(
+          path: '/secondRegister',
+          builder: (context, state) => const SecondUserRegisterPage()),
+      GoRoute(
+          path: '/finalRegister',
+          builder: (context, state) => const FinalUserRegisterPage())
     ],
   );
 });

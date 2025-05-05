@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:rebridge/shared/styles/button_style.dart';
+import 'package:rebridge/shared/styles/device_styles.dart';
+import 'package:rebridge/data/api/register_api.dart'; // RegisterApi 추가
 
 class FirstUserRegisterPage extends StatefulWidget {
   const FirstUserRegisterPage({super.key});
@@ -17,177 +21,314 @@ class _FirstUserRegisterPageState extends State<FirstUserRegisterPage> {
   final TextEditingController fullNameController = TextEditingController();
   final TextEditingController birthController = TextEditingController();
 
+  bool isAllFilled = false;
+  String selectedDomain = 'Enter manually';
+  bool isDomainEditable = true;
+
+  bool isCodeSent = false;
+  bool isConfirm = false;
+
+  final List<String> domainOptions = [
+    'Enter manually',
+    'gmail.com',
+    'yahoo.com',
+    'outlook.com',
+    'naver.com',
+    'daum.net',
+    'hanmail.net',
+    'hotmail.com'
+  ];
+
+  @override
+  void initState() {
+    super.initState();
+    emailIdController.addListener(_checkFields);
+    emailDomainController.addListener(_checkFields);
+    verificationCodeController.addListener(_checkFields);
+    passwordController.addListener(_checkFields);
+    passwordCheckController.addListener(_checkFields);
+    fullNameController.addListener(_checkFields);
+    birthController.addListener(_checkFields);
+  }
+
+  void _checkFields() {
+    final allFilled = emailIdController.text.isNotEmpty &&
+        emailDomainController.text.isNotEmpty &&
+        verificationCodeController.text.isNotEmpty &&
+        passwordController.text.isNotEmpty &&
+        passwordCheckController.text.isNotEmpty &&
+        fullNameController.text.isNotEmpty &&
+        birthController.text.isNotEmpty;
+
+    if (allFilled != isAllFilled) {
+      setState(() {
+        isAllFilled = allFilled;
+      });
+    }
+  }
+
+  @override
+  void dispose() {
+    emailIdController.dispose();
+    emailDomainController.dispose();
+    verificationCodeController.dispose();
+    passwordController.dispose();
+    passwordCheckController.dispose();
+    fullNameController.dispose();
+    birthController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _sendCode() async {
+    final emailId = emailIdController.text;
+    final emailDomain = emailDomainController.text;
+    final result = await RegisterApi.sendCode(context, emailId, emailDomain);
+    if (result) {
+      setState(() {
+        isCodeSent = true;
+      });
+    }
+  }
+
+  Future<void> _codeConfirm() async {
+    final certificationCode = verificationCodeController.text;
+    final result = await RegisterApi.verfiycode(context, certificationCode);
+
+    if (result) {
+      setState(() {
+        isConfirm = true;
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFF0F3FF),
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.all(24.0),
+          padding: EdgeInsets.symmetric(
+            horizontal: DeviceStyles.screenWidth(context) * 0.05,
+            vertical: DeviceStyles.screenHeight(context) * 0.02,
+          ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const SizedBox(height: 24),
-              const Center(
-                child: Text(
-                  'Sign Up',
-                  style: TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-              const SizedBox(height: 32),
-              const Text('Email'),
               Row(
                 children: [
+                  IconButton(
+                    icon: const Icon(Icons.arrow_back),
+                    onPressed: () {
+                      context.go('/agreeterms');
+                    },
+                  ),
                   Expanded(
-                    flex: 3,
-                    child: TextField(
-                      controller: emailIdController,
-                      decoration: const InputDecoration(
-                        hintText: '',
-                        filled: true,
-                        fillColor: Color(0xFFE7EBFF),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.all(Radius.circular(30)),
-                          borderSide: BorderSide.none,
+                    child: Center(
+                      child: Text(
+                        'Sign Up',
+                        style: TextStyle(
+                          fontSize: DeviceStyles.screenWidth(context) * 0.06,
+                          fontWeight: FontWeight.bold,
                         ),
                       ),
                     ),
                   ),
-                  const Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 4),
-                    child: Text('@'),
-                  ),
-                  Expanded(
-                    flex: 3,
-                    child: TextField(
-                      controller: emailDomainController,
-                      decoration: const InputDecoration(
-                        hintText: 'Enter manually',
-                        filled: true,
-                        fillColor: Color(0xFFE7EBFF),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.all(Radius.circular(30)),
-                          borderSide: BorderSide.none,
-                        ),
-                        suffixIcon: Icon(Icons.arrow_drop_down),
-                      ),
-                    ),
-                  ),
+                  SizedBox(width: DeviceStyles.screenWidth(context) * 0.1),
                 ],
               ),
-              const SizedBox(height: 12),
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: () {},
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF9DB6FF),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(30),
+              SizedBox(height: DeviceStyles.screenHeight(context) * 0.06),
+              Container(
+                padding:
+                    EdgeInsets.all(DeviceStyles.screenWidth(context) * 0.03),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius:
+                      BorderRadius.circular(ButtonStyles.borderradius(context)),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text('Email'),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            Expanded(
+                              flex: 3,
+                              child: TextField(
+                                controller: emailIdController,
+                                decoration: InputDecoration(
+                                  isDense: true,
+                                  filled: true,
+                                  fillColor: const Color(0xFFE7EBFF),
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.all(
+                                        Radius.circular(
+                                            ButtonStyles.borderradius(
+                                                context))),
+                                    borderSide: BorderSide.none,
+                                  ),
+                                ),
+                              ),
+                            ),
+                            Padding(
+                              padding: EdgeInsets.symmetric(
+                                  horizontal:
+                                      DeviceStyles.screenWidth(context) * 0.01),
+                              child: const Text('@'),
+                            ),
+                            Expanded(
+                              flex: 3,
+                              child: Row(
+                                children: [
+                                  Expanded(
+                                    child: TextField(
+                                      controller: emailDomainController,
+                                      enabled: isDomainEditable,
+                                      decoration: InputDecoration(
+                                        isDense: true,
+                                        hintText: 'Domain',
+                                        filled: true,
+                                        fillColor: const Color(0xFFE7EBFF),
+                                        border: OutlineInputBorder(
+                                          borderRadius: BorderRadius.all(
+                                              Radius.circular(
+                                                  ButtonStyles.borderradius(
+                                                      context))),
+                                          borderSide: BorderSide.none,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                  SizedBox(
+                                      height:
+                                          DeviceStyles.screenHeight(context) *
+                                              0.01),
+                                  DropdownButton<String>(
+                                    value: selectedDomain,
+                                    icon: const Icon(Icons.arrow_drop_down),
+                                    onChanged: (value) {
+                                      if (value == null) return;
+                                      setState(() {
+                                        selectedDomain = value;
+                                        if (value == 'Enter manually') {
+                                          isDomainEditable = true;
+                                          emailDomainController.clear();
+                                        } else {
+                                          isDomainEditable = false;
+                                          emailDomainController.text = value;
+                                        }
+                                        _checkFields();
+                                      });
+                                    },
+                                    items: domainOptions
+                                        .map(
+                                          (domain) => DropdownMenuItem<String>(
+                                            value: domain,
+                                            child: Text(domain),
+                                          ),
+                                        )
+                                        .toList(),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
                     ),
-                  ),
-                  child: const Text(
-                    'send code',
-                    style: TextStyle(color: Colors.black),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 16),
-              const Text('Verification Code'),
-              TextField(
-                controller: verificationCodeController,
-                decoration: const InputDecoration(
-                  filled: true,
-                  fillColor: Color(0xFFE7EBFF),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.all(Radius.circular(30)),
-                    borderSide: BorderSide.none,
-                  ),
-                ),
-              ),
-              const SizedBox(height: 16),
-              const Text('Password'),
-              TextField(
-                controller: passwordController,
-                obscureText: true,
-                decoration: const InputDecoration(
-                  hintText:
-                      'Must be at least 8 characters long, including letters and numbers',
-                  filled: true,
-                  fillColor: Color(0xFFE7EBFF),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.all(Radius.circular(30)),
-                    borderSide: BorderSide.none,
-                  ),
-                ),
-              ),
-              const SizedBox(height: 16),
-              const Text('Password Check'),
-              TextField(
-                controller: passwordCheckController,
-                obscureText: true,
-                decoration: const InputDecoration(
-                  hintText: 'Check password',
-                  filled: true,
-                  fillColor: Color(0xFFE7EBFF),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.all(Radius.circular(30)),
-                    borderSide: BorderSide.none,
-                  ),
-                ),
-              ),
-              const SizedBox(height: 16),
-              const Text('Full Name'),
-              TextField(
-                controller: fullNameController,
-                decoration: const InputDecoration(
-                  filled: true,
-                  fillColor: Color(0xFFE7EBFF),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.all(Radius.circular(30)),
-                    borderSide: BorderSide.none,
-                  ),
-                ),
-              ),
-              const SizedBox(height: 16),
-              const Text('Date of Birth'),
-              TextField(
-                controller: birthController,
-                decoration: const InputDecoration(
-                  suffixIcon: Icon(Icons.calendar_today_outlined),
-                  filled: true,
-                  fillColor: Color(0xFFE7EBFF),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.all(Radius.circular(30)),
-                    borderSide: BorderSide.none,
-                  ),
-                ),
-                readOnly: true,
-                onTap: () {
-                  // TODO: Date picker
-                },
-              ),
-              const SizedBox(height: 32),
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: () {},
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF4D65E1),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(16),
+                    SizedBox(height: DeviceStyles.screenHeight(context) * 0.01),
+                    SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton(
+                        onPressed: _sendCode,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFF9DB6FF),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(
+                                ButtonStyles.borderradius(context)),
+                          ),
+                        ),
+                        child: const Text(
+                          'send code',
+                          style: TextStyle(color: Colors.black),
+                        ),
+                      ),
                     ),
-                  ),
-                  child: const Padding(
-                    padding: EdgeInsets.symmetric(vertical: 14.0),
-                    child: Text(
-                      'Next',
-                      style: TextStyle(fontSize: 16, color: Colors.white),
-                    ),
-                  ),
+                    SizedBox(height: DeviceStyles.screenHeight(context) * 0.02),
+                    if (isCodeSent) ...[
+                      const Text('Verification Code'),
+                      TextField(
+                        controller: verificationCodeController,
+                        decoration: InputDecoration(
+                          isDense: true,
+                          filled: true,
+                          fillColor: const Color(0xFFE7EBFF),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.all(Radius.circular(
+                                ButtonStyles.borderradius(context))),
+                            borderSide: BorderSide.none,
+                          ),
+                        ),
+                      ),
+                      SizedBox(
+                          height: DeviceStyles.screenHeight(context) * 0.01),
+                      SizedBox(
+                        width: double.infinity,
+                        child: ElevatedButton(
+                          onPressed: _codeConfirm,
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: const Color(0xFF9DB6FF),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(
+                                  ButtonStyles.borderradius(context)),
+                            ),
+                          ),
+                          child: const Text(
+                            'Code Confirm',
+                            style: TextStyle(color: Colors.black),
+                          ),
+                        ),
+                      ),
+                      if (isConfirm) ...[
+                        SizedBox(
+                            height: DeviceStyles.screenHeight(context) * 0.08),
+                        SizedBox(
+                          width: double.infinity,
+                          child: ElevatedButton(
+                            onPressed: () {
+                              final email =
+                                  '${emailIdController.text}@${emailDomainController.text}';
+                              context.go('/secondRegister', extra: email);
+                            },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: ButtonStyles.buttonColor,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(
+                                    ButtonStyles.borderradius(context)),
+                              ),
+                            ),
+                            child: Padding(
+                              padding: EdgeInsets.symmetric(
+                                  horizontal:
+                                      ButtonStyles.paddingwidth(context),
+                                  vertical:
+                                      ButtonStyles.paddingheight(context)),
+                              child: Text(
+                                'Next',
+                                style: TextStyle(
+                                    fontSize:
+                                        DeviceStyles.screenWidth(context) *
+                                            0.04,
+                                    color: Colors.white),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ],
+                  ],
                 ),
               ),
             ],

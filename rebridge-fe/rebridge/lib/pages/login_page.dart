@@ -2,9 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:rebridge/shared/styles/background_styles.dart';
+
 import '../../../shared/styles/logo_styles.dart';
 import '../../../data/api/login_api.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+
+import '../shared/styles/button_style.dart';
+import 'package:rebridge/shared/styles/device_styles.dart';
 
 class LoginPage extends ConsumerStatefulWidget {
   const LoginPage({super.key});
@@ -33,28 +37,36 @@ class LoginPageState extends ConsumerState<LoginPage> {
       body: Center(
         child: SingleChildScrollView(
           child: Padding(
-            padding:
-                const EdgeInsets.symmetric(horizontal: 32.0, vertical: 32.0),
+            padding: EdgeInsets.symmetric(
+              horizontal: DeviceStyles.screenWidth(context) * 0.08,
+              vertical: DeviceStyles.screenHeight(context) * 0.03,
+            ),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const SizedBox(height: 8),
+                SizedBox(
+                  height: DeviceStyles.screenHeight(context) * 0.04,
+                ),
                 Image.asset(
                   'assets/images/test_logo_image.png',
-                  width: LogoStyles.width,
-                  height: LogoStyles.height,
+                  width: LogoStyles.width(context),
+                  height: LogoStyles.height(context),
                   fit: LogoStyles.fit,
                 ),
-                const SizedBox(height: 24),
-                const Text(
+                // SizedBox(
+                //   height: MediaQuery.of(context).size.height * 0.03,
+                // ),
+                Text(
                   'Re:Bridege',
                   style: TextStyle(
-                    fontSize: 20,
+                    fontSize: DeviceStyles.screenWidth(context) * 0.07,
                     fontWeight: FontWeight.bold,
                     color: Colors.black87,
                   ),
                 ),
-                const SizedBox(height: 24),
+                SizedBox(
+                  height: DeviceStyles.screenHeight(context) * 0.05,
+                ),
                 TextField(
                   controller: _idController,
                   enabled: true,
@@ -65,22 +77,28 @@ class LoginPageState extends ConsumerState<LoginPage> {
                     hintText: 'Email',
                     hintStyle: const TextStyle(color: Colors.grey),
                     border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(20),
+                      borderRadius: BorderRadius.circular(
+                          ButtonStyles.borderradius(context)),
                       borderSide: const BorderSide(color: Colors.grey),
                     ),
                     enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(20),
+                      borderRadius: BorderRadius.circular(
+                          ButtonStyles.borderradius(context)),
                       borderSide: const BorderSide(color: Colors.grey),
                     ),
                     focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(20),
+                      borderRadius: BorderRadius.circular(
+                          ButtonStyles.borderradius(context)),
                       borderSide: const BorderSide(color: Colors.grey),
                     ),
-                    contentPadding:
-                        const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+                    contentPadding: EdgeInsets.symmetric(
+                        horizontal: ButtonStyles.paddingwidth(context),
+                        vertical: ButtonStyles.paddingheight(context)),
                   ),
                 ),
-                const SizedBox(height: 16),
+                SizedBox(
+                  height: DeviceStyles.screenHeight(context) * 0.02,
+                ),
                 TextField(
                   controller: _pwController,
                   obscureText: true,
@@ -92,55 +110,66 @@ class LoginPageState extends ConsumerState<LoginPage> {
                     hintText: 'Password',
                     hintStyle: const TextStyle(color: Colors.grey),
                     enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(20),
+                      borderRadius: BorderRadius.circular(
+                          ButtonStyles.borderradius(context)),
                       borderSide: const BorderSide(color: Colors.grey),
                     ),
                     focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(20),
+                      borderRadius: BorderRadius.circular(
+                          ButtonStyles.borderradius(context)),
                       borderSide: const BorderSide(color: Colors.grey),
                     ),
-                    contentPadding:
-                        const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+                    contentPadding: EdgeInsets.symmetric(
+                        horizontal: ButtonStyles.paddingwidth(context),
+                        vertical: ButtonStyles.paddingheight(context)),
                   ),
                 ),
-                const SizedBox(height: 16),
+                SizedBox(
+                  height: DeviceStyles.screenHeight(context) * 0.02,
+                ),
                 SizedBox(
                   width: double.infinity,
                   child: ElevatedButton(
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0XFF4D65E1),
-                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      backgroundColor: ButtonStyles.buttonColor,
+                      padding: EdgeInsets.symmetric(
+                          horizontal: ButtonStyles.paddingwidth(context),
+                          vertical: ButtonStyles.paddingheight(context)),
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(20),
+                        borderRadius: BorderRadius.circular(
+                            ButtonStyles.borderradius(context)),
                       ),
                     ),
                     onPressed: _handleLogin,
-                    child: const Text(
+                    child: Text(
                       'Login',
                       style: TextStyle(
-                          fontSize: 16,
+                          fontSize: DeviceStyles.screenWidth(context) * 0.04,
                           fontWeight: FontWeight.bold,
                           color: Colors.white),
                     ),
                   ),
                 ),
-                const SizedBox(height: 16),
-                const Row(
+                SizedBox(
+                  height: DeviceStyles.screenHeight(context) * 0.02,
+                ),
+                Row(
                   children: [
-                    Expanded(
+                    const Expanded(
                       child: Divider(
                         color: Colors.grey,
                         thickness: 1,
                       ),
                     ),
                     Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 8),
-                      child: Text(
+                      padding: EdgeInsets.symmetric(
+                          horizontal: DeviceStyles.screenWidth(context) * 0.02),
+                      child: const Text(
                         'OR',
                         style: TextStyle(color: Colors.grey),
                       ),
                     ),
-                    Expanded(
+                    const Expanded(
                       child: Divider(
                         color: Colors.grey,
                         thickness: 1,
@@ -148,32 +177,38 @@ class LoginPageState extends ConsumerState<LoginPage> {
                     ),
                   ],
                 ),
-                const SizedBox(height: 16),
+                SizedBox(
+                  height: DeviceStyles.screenHeight(context) * 0.02,
+                ),
                 SizedBox(
                   width: double.infinity,
                   child: ElevatedButton(
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      padding: EdgeInsets.symmetric(
+                          horizontal: ButtonStyles.paddingwidth(context),
+                          vertical: ButtonStyles.paddingheight(context)),
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(20),
+                        borderRadius: BorderRadius.circular(
+                            ButtonStyles.borderradius(context)),
                         side: const BorderSide(color: Colors.grey),
                       ),
                     ),
                     onPressed: () {},
-                    child: const Row(
+                    child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        FaIcon(
+                        const FaIcon(
                           FontAwesomeIcons.google,
                           size: 20,
                         ),
-                        SizedBox(width: 12),
+                        SizedBox(
+                            width: DeviceStyles.screenWidth(context) * 0.03),
                         Text(
                           'Sign up/in Google',
                           style: TextStyle(
-                            fontSize: 16,
+                            fontSize: DeviceStyles.screenWidth(context) * 0.04,
                             fontWeight: FontWeight.bold,
                             color: Colors.grey,
                           ),
@@ -182,7 +217,9 @@ class LoginPageState extends ConsumerState<LoginPage> {
                     ),
                   ),
                 ),
-                const SizedBox(height: 16),
+                SizedBox(
+                  height: DeviceStyles.screenHeight(context) * 0.02,
+                ),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
@@ -217,7 +254,9 @@ class LoginPageState extends ConsumerState<LoginPage> {
                     ),
                   ],
                 ),
-                const SizedBox(height: 8),
+                SizedBox(
+                  height: DeviceStyles.screenHeight(context) * 0.01,
+                ),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
@@ -230,7 +269,7 @@ class LoginPageState extends ConsumerState<LoginPage> {
                     ),
                     TextButton(
                       onPressed: () {
-                        context.go('/firstRegister');
+                        context.go('/membershipguide');
                       },
                       child: const Text(
                         'Sign Up',
@@ -241,7 +280,6 @@ class LoginPageState extends ConsumerState<LoginPage> {
                     ),
                   ],
                 ),
-                const SizedBox(height: 8),
               ],
             ),
           ),

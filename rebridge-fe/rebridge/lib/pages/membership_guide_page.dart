@@ -21,16 +21,6 @@ class MembershipGuidePage extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              Row(
-                children: [
-                  IconButton(
-                    icon: const Icon(Icons.arrow_back),
-                    onPressed: () {
-                      context.go('/login');
-                    },
-                  ),
-                ],
-              ),
               SizedBox(height: DeviceStyles.screenHeight(context) * 0.01),
               Image.asset(
                 'assets/images/register_logo_imgage.png',
@@ -142,7 +132,7 @@ class MembershipGuidePage extends StatelessWidget {
                     ),
                   ),
                   onPressed: () {
-                    context.go('/agreeterms');
+                    context.push('/agreeterms');
                   },
                   child: Padding(
                     padding: EdgeInsets.symmetric(

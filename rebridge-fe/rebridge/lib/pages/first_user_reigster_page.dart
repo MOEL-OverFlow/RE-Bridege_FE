@@ -1,17 +1,20 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:rebridge/shared/providers/user_register_provider.dart';
 import 'package:rebridge/shared/styles/button_style.dart';
 import 'package:rebridge/shared/styles/device_styles.dart';
-import 'package:rebridge/data/api/register_api.dart'; // RegisterApi 추가
+import 'package:rebridge/data/api/register_api.dart';
 
-class FirstUserRegisterPage extends StatefulWidget {
+class FirstUserRegisterPage extends ConsumerStatefulWidget {
   const FirstUserRegisterPage({super.key});
 
   @override
-  State<FirstUserRegisterPage> createState() => _FirstUserRegisterPageState();
+  ConsumerState<FirstUserRegisterPage> createState() =>
+      _FirstUserRegisterPageState();
 }
 
-class _FirstUserRegisterPageState extends State<FirstUserRegisterPage> {
+class _FirstUserRegisterPageState extends ConsumerState<FirstUserRegisterPage> {
   final TextEditingController emailIdController = TextEditingController();
   final TextEditingController emailDomainController = TextEditingController();
   final TextEditingController verificationCodeController =
@@ -27,7 +30,10 @@ class _FirstUserRegisterPageState extends State<FirstUserRegisterPage> {
 
   bool isCodeSent = false;
   bool isConfirm = false;
-
+  bool get isPasswordMatch =>
+      passwordController.text.isNotEmpty &&
+      passwordCheckController.text.isNotEmpty &&
+      passwordController.text == passwordCheckController.text;
   final List<String> domainOptions = [
     'Enter manually',
     'gmail.com',
@@ -92,7 +98,7 @@ class _FirstUserRegisterPageState extends State<FirstUserRegisterPage> {
 
   Future<void> _codeConfirm() async {
     final certificationCode = verificationCodeController.text;
-    final result = await RegisterApi.verfiycode(context, certificationCode);
+    final result = await RegisterApi.verifyCode(context, certificationCode);
 
     if (result) {
       setState(() {
@@ -116,12 +122,6 @@ class _FirstUserRegisterPageState extends State<FirstUserRegisterPage> {
             children: [
               Row(
                 children: [
-                  IconButton(
-                    icon: const Icon(Icons.arrow_back),
-                    onPressed: () {
-                      context.go('/agreeterms');
-                    },
-                  ),
                   Expanded(
                     child: Center(
                       child: Text(
@@ -291,7 +291,61 @@ class _FirstUserRegisterPageState extends State<FirstUserRegisterPage> {
                           ),
                         ),
                       ),
+                      SizedBox(
+                          height: DeviceStyles.screenHeight(context) * 0.02),
                       if (isConfirm) ...[
+                        const Text('Password'),
+                        TextField(
+                          controller: passwordController,
+                          obscureText: true,
+                          decoration: InputDecoration(
+                            isDense: true,
+                            hintText: 'Must be at least 8 characters long',
+                            filled: true,
+                            fillColor: const Color(0xFFE7EBFF),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.all(
+                                Radius.circular(
+                                  ButtonStyles.borderradius(context),
+                                ),
+                              ),
+                              borderSide: BorderSide.none,
+                            ),
+                          ),
+                        ),
+                        SizedBox(
+                          height: DeviceStyles.screenHeight(context) * 0.02,
+                        ),
+                        const Text('Password Check'),
+                        TextField(
+                          controller: passwordCheckController,
+                          obscureText: true,
+                          decoration: InputDecoration(
+                            isDense: true,
+                            hintText: 'Check password',
+                            filled: true,
+                            fillColor: const Color(0xFFE7EBFF),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.all(
+                                Radius.circular(
+                                  ButtonStyles.borderradius(context),
+                                ),
+                              ),
+                              borderSide: BorderSide.none,
+                            ),
+                            suffixIcon: (() {
+                              if (passwordController.text.isEmpty &&
+                                  passwordCheckController.text.isEmpty) {
+                                return null;
+                              }
+
+                              return (isPasswordMatch)
+                                  ? const Icon(Icons.check_circle,
+                                      color: Colors.green)
+                                  : const Icon(Icons.close, color: Colors.red);
+                            })(),
+                          ),
+                        ),
                         SizedBox(
                             height: DeviceStyles.screenHeight(context) * 0.08),
                         SizedBox(
@@ -300,7 +354,26 @@ class _FirstUserRegisterPageState extends State<FirstUserRegisterPage> {
                             onPressed: () {
                               final email =
                                   '${emailIdController.text}@${emailDomainController.text}';
-                              context.go('/secondRegister', extra: email);
+                              final password = passwordController.text;
+
+                              final prevState = ref.read(userRegisterProvider);
+
+                              ref.read(userRegisterProvider.notifier).state =
+                                  RegisterUser(
+                                email: email,
+                                password: password,
+                                fullName: prevState?.fullName ?? '',
+                                birth: prevState?.birth ?? '',
+                                foreignNumber: prevState?.foreignNumber ?? '',
+                                nationality: prevState?.nationality ?? '',
+                                primaryIndustry:
+                                    prevState?.primaryIndustry ?? '',
+                                secondaryIndustry:
+                                    prevState?.secondaryIndustry ?? '',
+                                imagePath: prevState?.imagePath ?? '',
+                              );
+
+                              context.push('/secondRegister');
                             },
                             style: ElevatedButton.styleFrom(
                               backgroundColor: ButtonStyles.buttonColor,

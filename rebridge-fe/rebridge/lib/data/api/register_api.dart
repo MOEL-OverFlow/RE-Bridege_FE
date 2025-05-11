@@ -65,10 +65,10 @@ class RegisterApi {
     print('Full Name: ${userData.fullName}');
     print('Birth: ${userData.birth}');
     print('Foreigner Number: ${userData.foreignNumber}');
-    print('Nationality: ${userData.nationality ?? "미입력"}');
-    print('Primary Industry: ${userData.primaryIndustry ?? "미입력"}');
-    print('Secondary Industry: ${userData.secondaryIndustry ?? "미입력"}');
-    print('Image Path: ${userData.imagePath ?? "미선택"}');
+    print('Nationality: ${userData.nationality}');
+    print('Primary Industry: ${userData.primaryIndustry}');
+    print('Secondary Industry: ${userData.secondaryIndustry}');
+    print('Image Path: ${userData.imagePath}');
     print('--------------------------------');
 
     if (!context.mounted) return false;

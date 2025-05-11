@@ -199,7 +199,7 @@ class LoginPageState extends ConsumerState<LoginPage> {
                         side: const BorderSide(color: Colors.grey),
                       ),
                     ),
-                    onPressed: () {},
+                    onPressed: () => LoginApi.googlelogin(context, ref),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       mainAxisSize: MainAxisSize.min,
@@ -274,7 +274,7 @@ class LoginPageState extends ConsumerState<LoginPage> {
                     ),
                     TextButton(
                       onPressed: () {
-                        context.go('/membershipguide');
+                        context.push('/membershipguide');
                       },
                       child: const Text(
                         'Sign Up',

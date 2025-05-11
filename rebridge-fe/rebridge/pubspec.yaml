@@ -40,6 +40,8 @@ dependencies:
   font_awesome_flutter: ^10.8.0
   image_picker: ^1.1.2
   url_launcher: ^6.2.5
+  google_sign_in: ^6.1.6
+  http: ^1.4.0
 
 dev_dependencies:
   flutter_test:

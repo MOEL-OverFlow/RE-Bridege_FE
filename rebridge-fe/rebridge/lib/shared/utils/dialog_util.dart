@@ -22,13 +22,19 @@ class DialogUtil {
             textAlign: TextAlign.center,
           ),
         ),
-        content: Text(
-          content,
-          style: const TextStyle(
-            color: Colors.black,
-            fontSize: 16,
+        content: SizedBox(
+          width: 300,
+          height: 200,
+          child: SingleChildScrollView(
+            child: Text(
+              content,
+              style: const TextStyle(
+                color: Colors.black,
+                fontSize: 16,
+              ),
+              textAlign: TextAlign.center,
+            ),
           ),
-          textAlign: TextAlign.center,
         ),
         actionsAlignment: MainAxisAlignment.center,
         actions: [

@@ -57,7 +57,7 @@ class LoginPageState extends ConsumerState<LoginPage> {
                 //   height: MediaQuery.of(context).size.height * 0.03,
                 // ),
                 Text(
-                  'Re:Bridege',
+                  'Re:Bridge',
                   style: TextStyle(
                     fontSize: DeviceStyles.screenWidth(context) * 0.07,
                     fontWeight: FontWeight.bold,
@@ -141,11 +141,6 @@ class LoginPageState extends ConsumerState<LoginPage> {
                       ),
                     ),
                     onPressed: _handleLogin,
-                    //onPressed: () {
-                    // Temporary navigation to checklist page for testing
-                    //context.go('/checklists');
-                    //},
-                    // 요까지
                     child: Text(
                       'Login',
                       style: TextStyle(

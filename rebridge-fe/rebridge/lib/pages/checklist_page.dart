@@ -84,6 +84,15 @@ class _ChecklistPageState extends State<ChecklistPage> {
                     if (title == 'Departure Insurance') {
                       _launchUrl(
                           'https://impossible-repair-22e.notion.site/Departure-Guarantee-Insurance-1f07c2138e7a806fb081f99fdf1c215f');
+                    } else if (title == 'Expense Insurance') {
+                      _launchUrl(
+                          'https://impossible-repair-22e.notion.site/Return-Cost-Insurance-1f07c2138e7a807490c1f5b172b703fe');
+                    } else if (title == 'Surety Insurance') {
+                      _launchUrl(
+                          'https://impossible-repair-22e.notion.site/Wage-Guarantee-Insurance-1f07c2138e7a802d9751c7b22564c1d4');
+                    } else if (title == 'Accident Insurance') {
+                      _launchUrl(
+                          'https://impossible-repair-22e.notion.site/Accident-Insurance-1f07c2138e7a80f9a853d8a0d65784ea');
                     }
                   },
                   child: const Text(
@@ -107,7 +116,10 @@ class _ChecklistPageState extends State<ChecklistPage> {
                   ),
                   onPressed: () {
                     Navigator.of(context).pop();
-                    if (title == 'Departure Insurance') {
+                    if (title == 'Departure Insurance' ||
+                        title == 'Expense Insurance' ||
+                        title == 'Surety Insurance' ||
+                        title == 'Accident Insurance') {
                       _launchUrl(
                           'https://eps.hrdkorea.or.kr/e9/user/intro/intro.do?method=epsInsurances');
                     }

@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:rebridge/shared/styles/button_style.dart';
+import 'package:rebridge/shared/styles/device_styles.dart';
 
 class DialogUtil {
   static void showCustomDialog(
@@ -14,37 +16,40 @@ class DialogUtil {
         title: Center(
           child: Text(
             title,
-            style: const TextStyle(
+            style: TextStyle(
               color: Colors.black,
-              fontSize: 20,
+              fontSize: DeviceStyles.screenWidth(context) * 0.06,
               fontWeight: FontWeight.bold,
             ),
             textAlign: TextAlign.center,
           ),
         ),
         content: SizedBox(
-          width: 300,
-          height: 200,
-          child: SingleChildScrollView(
-            child: Text(
-              content,
-              style: const TextStyle(
-                color: Colors.black,
-                fontSize: 16,
+          width: DeviceStyles.screenWidth(context) * 0.8,
+          height: DeviceStyles.screenHeight(context) * 0.3,
+          child: Center(
+            child: SingleChildScrollView(
+              child: Text(
+                content,
+                style: TextStyle(
+                  color: Colors.black,
+                  fontSize: DeviceStyles.screenWidth(context) * 0.045,
+                ),
+                textAlign: TextAlign.center,
               ),
-              textAlign: TextAlign.center,
             ),
           ),
         ),
         actionsAlignment: MainAxisAlignment.center,
         actions: [
           SizedBox(
-            width: 120,
+            width: DeviceStyles.screenWidth(context) * 0.5,
             child: ElevatedButton(
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF4D65E1),
+                backgroundColor: ButtonStyles.buttonColor,
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
+                  borderRadius:
+                      BorderRadius.circular(ButtonStyles.borderradius(context)),
                 ),
               ),
               onPressed: () {
@@ -54,11 +59,11 @@ class DialogUtil {
                   Navigator.of(context).pop();
                 }
               },
-              child: const Text(
+              child: Text(
                 'Confirm',
                 style: TextStyle(
                   color: Colors.white,
-                  fontSize: 16,
+                  fontSize: DeviceStyles.screenWidth(context) * 0.04,
                 ),
               ),
             ),

@@ -15,18 +15,26 @@ class SecondUserRegisterPage extends ConsumerStatefulWidget {
 
 class _SecondUserRegisterPageState
     extends ConsumerState<SecondUserRegisterPage> {
-  final TextEditingController fullNameController = TextEditingController();
-  final TextEditingController birthController = TextEditingController();
-  final TextEditingController foreignnumberController = TextEditingController();
+  late final TextEditingController fullNameController;
+  late final TextEditingController birthController;
+  late final TextEditingController foreignnumberController;
 
   bool isAllFilled = false;
 
   @override
   void initState() {
     super.initState();
+    final state = ref.read(userRegisterProvider);
+    fullNameController = TextEditingController(text: state?.fullName ?? '');
+    birthController = TextEditingController(text: state?.birth ?? '');
+    foreignnumberController =
+        TextEditingController(text: state?.foreignNumber ?? '');
+
     fullNameController.addListener(_checkFields);
     birthController.addListener(_checkFields);
     foreignnumberController.addListener(_checkFields);
+
+    _checkFields();
   }
 
   void _checkFields() {

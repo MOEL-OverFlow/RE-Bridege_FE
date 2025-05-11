@@ -13,6 +13,7 @@ class SplashPage extends ConsumerStatefulWidget {
 class _SplashPageState extends ConsumerState<SplashPage> {
   double progress = 0.0;
   int percentage = 0;
+  bool _navigated = false; // 중복 이동 방지
 
   @override
   void initState() {
@@ -24,29 +25,33 @@ class _SplashPageState extends ConsumerState<SplashPage> {
     const duration = Duration(milliseconds: 30);
     Future.delayed(Duration.zero, () {
       Stream.periodic(duration, (count) => count).take(101).listen((count) {
+        if (!mounted) return;
+
         setState(() {
           progress = count / 100;
           percentage = count;
         });
-
-        if (count == 100) {
-          _moveToNextPage();
-        }
       });
     });
   }
 
-  void _moveToNextPage() {
-    final isLoggedIn = ref.read(authProvider);
-    if (isLoggedIn) {
-      context.go('/home');
-    } else {
-      context.go('/login');
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
+    final isLoggedIn = ref.watch(authProvider);
+
+    // 퍼센트가 100이 되었고 아직 이동하지 않았다면 라우팅 처리
+    if (percentage == 100 && !_navigated) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted) return;
+        _navigated = true; // 한 번만 이동하도록 설정
+        if (isLoggedIn) {
+          context.go('/home');
+        } else {
+          context.go('/login');
+        }
+      });
+    }
+
     return Scaffold(
       backgroundColor: Colors.white,
       body: Center(

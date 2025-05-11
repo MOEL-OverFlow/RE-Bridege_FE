@@ -23,9 +23,12 @@ class _FirstUserRegisterPageState extends ConsumerState<FirstUserRegisterPage> {
   final TextEditingController passwordCheckController = TextEditingController();
   final TextEditingController fullNameController = TextEditingController();
   final TextEditingController birthController = TextEditingController();
+  bool isPasswordVisible = false;
+  bool isConfirmPasswordVisible = false;
+  bool isManualEmailInput = false;
 
   bool isAllFilled = false;
-  String selectedDomain = 'Enter manually';
+  String? selectedDomain;
   bool isDomainEditable = true;
 
   bool isCodeSent = false;
@@ -34,15 +37,14 @@ class _FirstUserRegisterPageState extends ConsumerState<FirstUserRegisterPage> {
       passwordController.text.isNotEmpty &&
       passwordCheckController.text.isNotEmpty &&
       passwordController.text == passwordCheckController.text;
-  final List<String> domainOptions = [
-    'Enter manually',
+  final List<String> emailDomains = [
     'gmail.com',
-    'yahoo.com',
-    'outlook.com',
     'naver.com',
     'daum.net',
     'hanmail.net',
-    'hotmail.com'
+    'yahoo.com',
+    'hotmail.com',
+    'Enter Manually'
   ];
 
   @override
@@ -83,6 +85,19 @@ class _FirstUserRegisterPageState extends ConsumerState<FirstUserRegisterPage> {
     fullNameController.dispose();
     birthController.dispose();
     super.dispose();
+  }
+
+  void _handleDomainChange(String? value) {
+    setState(() {
+      selectedDomain = value;
+      if (value == 'Enter Manually') {
+        isManualEmailInput = true;
+        emailDomainController.clear();
+      } else {
+        isManualEmailInput = false;
+        emailDomainController.text = value ?? '';
+      }
+    });
   }
 
   Future<void> _sendCode() async {
@@ -180,58 +195,50 @@ class _FirstUserRegisterPageState extends ConsumerState<FirstUserRegisterPage> {
                             ),
                             Expanded(
                               flex: 3,
-                              child: Row(
-                                children: [
-                                  Expanded(
-                                    child: TextField(
-                                      controller: emailDomainController,
-                                      enabled: isDomainEditable,
-                                      decoration: InputDecoration(
-                                        isDense: true,
-                                        hintText: 'Domain',
-                                        filled: true,
-                                        fillColor: const Color(0xFFE7EBFF),
-                                        border: OutlineInputBorder(
-                                          borderRadius: BorderRadius.all(
-                                              Radius.circular(
-                                                  ButtonStyles.borderradius(
-                                                      context))),
-                                          borderSide: BorderSide.none,
-                                        ),
-                                      ),
-                                    ),
+                              child: TextField(
+                                controller: emailDomainController,
+                                enabled: isManualEmailInput,
+                                decoration: InputDecoration(
+                                  isDense: true,
+                                  filled: true,
+                                  fillColor: const Color(0xFFE7EBFF),
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.all(
+                                        Radius.circular(
+                                            ButtonStyles.borderradius(
+                                                context))),
+                                    borderSide: BorderSide.none,
                                   ),
-                                  SizedBox(
-                                      height:
-                                          DeviceStyles.screenHeight(context) *
-                                              0.01),
-                                  DropdownButton<String>(
-                                    value: selectedDomain,
-                                    icon: const Icon(Icons.arrow_drop_down),
-                                    onChanged: (value) {
-                                      if (value == null) return;
-                                      setState(() {
-                                        selectedDomain = value;
-                                        if (value == 'Enter manually') {
-                                          isDomainEditable = true;
-                                          emailDomainController.clear();
-                                        } else {
-                                          isDomainEditable = false;
-                                          emailDomainController.text = value;
-                                        }
-                                        _checkFields();
-                                      });
-                                    },
-                                    items: domainOptions
-                                        .map(
-                                          (domain) => DropdownMenuItem<String>(
-                                            value: domain,
-                                            child: Text(domain),
-                                          ),
-                                        )
-                                        .toList(),
+                                ),
+                              ),
+                            ),
+                            SizedBox(
+                                width:
+                                    DeviceStyles.screenWidth(context) * 0.01),
+                            Container(
+                              width: DeviceStyles.screenWidth(context) * 0.1,
+                              decoration: BoxDecoration(
+                                color: const Color(0xFFE7EBFF),
+                                borderRadius: BorderRadius.all(Radius.circular(
+                                    ButtonStyles.borderradius(context))),
+                              ),
+                              child: DropdownButtonHideUnderline(
+                                child: DropdownButton<String>(
+                                  value: null,
+                                  isExpanded: true,
+                                  icon: const Icon(Icons.arrow_drop_down),
+                                  style: const TextStyle(
+                                    color: Colors.black,
+                                    fontSize: 14,
                                   ),
-                                ],
+                                  items: emailDomains.map((String domain) {
+                                    return DropdownMenuItem<String>(
+                                      value: domain,
+                                      child: Text(domain),
+                                    );
+                                  }).toList(),
+                                  onChanged: _handleDomainChange,
+                                ),
                               ),
                             ),
                           ],

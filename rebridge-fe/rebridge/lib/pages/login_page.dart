@@ -141,6 +141,11 @@ class LoginPageState extends ConsumerState<LoginPage> {
                       ),
                     ),
                     onPressed: _handleLogin,
+                    //onPressed: () {
+                    // Temporary navigation to checklist page for testing
+                    //context.go('/checklists');
+                    //},
+                    // 요까지
                     child: Text(
                       'Login',
                       style: TextStyle(

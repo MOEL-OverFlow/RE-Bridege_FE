@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:rebridge/shared/address.dart';
+import 'package:rebridge/shared/providers/user_register_provider.dart';
 import '../../shared/utils/dialog_util.dart';
 import '../../shared/providers/auth_provider.dart';
 import 'package:google_sign_in/google_sign_in.dart';
@@ -34,6 +35,7 @@ class LoginApi {
     const User(
         userId: '004', username: '5310009@naver.com', password: '12345678'),
     const User(userId: '005', username: 'flutterdev', password: 'flutter123'),
+    const User(userId: '007', username: 'qwer', password: '123'),
   ];
 
   static Future<void> normallogin(
@@ -107,21 +109,54 @@ class LoginApi {
       if (response.statusCode == 200) {
         final responseData = json.decode(response.body);
         final role = responseData['role'];
-        print(responseData);
+        final name = responseData['name'] ?? '';
+        final email = responseData['email'] ?? '';
 
-        await ref.read(authProvider.notifier).login();
+        print('[GoogleLogin] ✅ 응답 데이터: $responseData');
 
         if (!context.mounted) return;
 
         if (role == 'GUEST') {
-          context.go('/secondRegister');
+          DialogUtil.showCustomDialog(
+            context,
+            title: 'Alert',
+            content:
+                'You signed up via Google.\nTo complete the process, please enter additional information.',
+            onConfirm: () {
+              Navigator.of(context).pop();
+
+              ref.read(userRegisterProvider.notifier).state = RegisterUser(
+                email: email,
+                password: '',
+                fullName: name,
+                birth: '',
+                foreignNumber: '',
+                nationality: '',
+                primaryIndustry: '',
+                secondaryIndustry: '',
+                imagePath: '',
+              );
+              print(email);
+              print(name);
+              context.push('/secondRegister');
+            },
+          );
         } else if (role == 'MEMBER') {
-          context.go('/home');
+          DialogUtil.showCustomDialog(
+            context,
+            title: 'Welcome!',
+            content: 'Welcome!',
+            onConfirm: () {
+              Navigator.of(context).pop();
+              ref.read(authProvider.notifier).login();
+              context.push('/home');
+            },
+          );
         } else {
           DialogUtil.showCustomDialog(
             context,
             title: 'Error',
-            content: 'you are a withdrawn member. you can' 't login.',
+            content: '탈퇴한 회원입니다. 로그인할 수 없습니다.',
           );
         }
       } else {

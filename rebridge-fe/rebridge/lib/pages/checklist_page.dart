@@ -5,6 +5,9 @@ import 'package:rebridge/shared/styles/device_styles.dart';
 import '../../shared/styles/logo_styles.dart';
 import '../../shared/styles/background_styles.dart';
 import 'package:url_launcher/url_launcher.dart';
+// 서버 연결 필요
+// import 'dart:convert';
+// import 'package:http/http.dart' as http;
 
 class ChecklistPage extends StatefulWidget {
   const ChecklistPage({super.key});
@@ -22,10 +25,10 @@ class _ChecklistPageState extends State<ChecklistPage> {
 
   // Documents toggles
   bool customDeclaration = false;
-  bool severancePay = false;
+  bool retirementAllowance = false;
 
-  // Training Program toggles
-  bool resettlementSupport = false;
+  // Education Program toggles
+  bool repatriationSupport = false;
   bool foreignWorkerTraining = false;
 
   Future<void> _launchUrl(String urlString) async {
@@ -34,6 +37,44 @@ class _ChecklistPageState extends State<ChecklistPage> {
       throw Exception('Could not launch $url');
     }
   }
+
+  // Future<void> _submitChecklist() async {
+  //   try {
+  //     final response = await http.post(
+  //       Uri.parse('http://localhost:8080/checklists'),
+  //       headers: {
+  //         'Content-Type': 'application/json',
+  //       },
+  //       body: jsonEncode({
+  //         'customDeclaration': customDeclaration,
+  //         'retirementAllowance': retirementAllowance,
+  //         'departureInsurance': departureInsurance,
+  //         'expenseInsurance': expenseInsurance,
+  //         'suretyInsurance': suretyInsurance,
+  //         'accidentInsurance': accidentInsurance,
+  //         'repatriationSupport': repatriationSupport,
+  //         'foreignWorkerTraining': foreignWorkerTraining,
+  //       }),
+  //     );
+
+  //     if (response.statusCode == 200) {
+  //       // 성공 시 처리
+  //       ScaffoldMessenger.of(context).showSnackBar(
+  //         const SnackBar(content: Text('Checklist submitted successfully')),
+  //       );
+  //     } else {
+  //       // 실패 시 처리
+  //       ScaffoldMessenger.of(context).showSnackBar(
+  //         const SnackBar(content: Text('Failed to submit checklist')),
+  //       );
+  //     }
+  //   } catch (e) {
+  //     // 에러 처리
+  //     ScaffoldMessenger.of(context).showSnackBar(
+  //       SnackBar(content: Text('Error: ${e.toString()}')),
+  //     );
+  //   }
+  // }
 
   void _showItemDialog(String title) {
     showDialog(
@@ -77,7 +118,10 @@ E-9 Visa
 
 H-2 Visa
 Starting date of employment contract'''
-                  : "테스트",
+                  : title == 'Repatriation Support' ||
+                          title == 'Foreign Worker Training'
+                      ? '''This is an educational program designed to help foreign workers acquire Korean language skills and necessary technical skills during their stay in Korea, ensuring stable repatriation to their home country upon the expiration of their stay.'''
+                      : "Documents",
               style: const TextStyle(
                 color: Colors.black,
                 fontSize: 16,
@@ -114,6 +158,18 @@ Starting date of employment contract'''
                     } else if (title == 'Accident Insurance') {
                       _launchUrl(
                           'https://impossible-repair-22e.notion.site/Accident-Insurance-1f07c2138e7a80f9a853d8a0d65784ea');
+                    } else if (title == 'Custom Declaration') {
+                      _launchUrl(
+                          'https://impossible-repair-22e.notion.site/Custom-Declaration-1f07c2138e7a80279f5dc91b2f2ad58b');
+                    } else if (title == 'Retirement Allowance') {
+                      _launchUrl(
+                          'https://impossible-repair-22e.notion.site/Retirement-Allowance-Settlement-1f07c2138e7a80898604cfda799b9ac2');
+                    } else if (title == 'Repatriation Support') {
+                      _launchUrl(
+                          'https://impossible-repair-22e.notion.site/Repatriation-Support-1f07c2138e7a806c88e0d92afc2cf938');
+                    } else if (title == 'Foreign Worker Training') {
+                      _launchUrl(
+                          'https://impossible-repair-22e.notion.site/Training-for-Foreign-Workers-1f07c2138e7a80e2847eff0ea18c59f6');
                     }
                   },
                   child: const Text(
@@ -146,8 +202,12 @@ Starting date of employment contract'''
                     } else if (title == 'Custom Declaration') {
                       _launchUrl(
                           'https://www.customs.go.kr/incheon_airport/cm/cntnts/cntntsView.do?mi=12547&cntntsId=6688');
-                    } else if (title == 'Severance Pay') {
+                    } else if (title == 'Retirement Allowance') {
                       _launchUrl('https://hrdc.hrdkorea.or.kr/hrdc/104013');
+                    } else if (title == 'Repatriation Support' ||
+                        title == 'Foreign Worker Training') {
+                      _launchUrl(
+                          'https://eps.hrdkorea.or.kr/e9/user/programs/programs.do?method=programsGuid');
                     }
                   },
                   child: const Text(
@@ -170,136 +230,136 @@ Starting date of employment contract'''
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: BackgroundStyles.backgroundColor,
-      body: SafeArea(
-        child: Padding(
-          padding: EdgeInsets.symmetric(
-            horizontal: DeviceStyles.screenWidth(context) * 0.08,
-            vertical: DeviceStyles.screenHeight(context) * 0.03,
-          ),
-          child: Column(
-            children: [
-              Row(
-                children: [
-                  IconButton(
-                    icon: const Icon(Icons.arrow_back),
-                    onPressed: () {
-                      context.go('/membershipguide');
-                    },
-                  ),
-                ],
-              ),
-              SizedBox(height: DeviceStyles.screenHeight(context) * 0.02),
-              Align(
-                alignment: Alignment.center,
-                child: Text(
-                  'Check List',
-                  style: TextStyle(
-                    fontSize: DeviceStyles.screenWidth(context) * 0.045,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-              SizedBox(height: DeviceStyles.screenHeight(context) * 0.02),
-              Expanded(
-                child: SingleChildScrollView(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // Insurance Section
-                      _buildSectionTitle('Insurances'),
-                      _buildCheckboxItem(
-                          'Departure Insurance', departureInsurance, (value) {
-                        setState(() {
-                          departureInsurance = value ?? false;
-                        });
-                      }, () => _showItemDialog('Departure Insurance')),
-                      _buildCheckboxItem('Expense Insurance', expenseInsurance,
-                          (value) {
-                        setState(() {
-                          expenseInsurance = value ?? false;
-                        });
-                      }, () => _showItemDialog('Expense Insurance')),
-                      _buildCheckboxItem('Surety Insurance', suretyInsurance,
-                          (value) {
-                        setState(() {
-                          suretyInsurance = value ?? false;
-                        });
-                      }, () => _showItemDialog('Surety Insurance')),
-                      _buildCheckboxItem(
-                          'Accident Insurance', accidentInsurance, (value) {
-                        setState(() {
-                          accidentInsurance = value ?? false;
-                        });
-                      }, () => _showItemDialog('Accident Insurance')),
-                      const Divider(),
-
-                      // Documents Section
-                      _buildSectionTitle('Documents'),
-                      _buildCheckboxItem(
-                          'Custom Declaration', customDeclaration, (value) {
-                        setState(() {
-                          customDeclaration = value ?? false;
-                        });
-                      }, () => _showItemDialog('Custom Declaration')),
-                      _buildCheckboxItem('Severance Pay', severancePay,
-                          (value) {
-                        setState(() {
-                          severancePay = value ?? false;
-                        });
-                      }, () => _showItemDialog('Severance Pay')),
-                      const Divider(),
-
-                      // Training Programs Section
-                      _buildSectionTitle('Training Programs'),
-                      _buildCheckboxItem(
-                          'Resettlement Support', resettlementSupport, (value) {
-                        setState(() {
-                          resettlementSupport = value ?? false;
-                        });
-                      }, () => _showItemDialog('Resettlement Support')),
-                      _buildCheckboxItem(
-                          'Foreign Worker Training', foreignWorkerTraining,
-                          (value) {
-                        setState(() {
-                          foreignWorkerTraining = value ?? false;
-                        });
-                      }, () => _showItemDialog('Foreign Worker Training')),
-                    ],
-                  ),
-                ),
-              ),
-              SizedBox(height: DeviceStyles.screenHeight(context) * 0.02),
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF4D65E1),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(
-                          ButtonStyles.borderradius(context)),
-                    ),
-                  ),
-                  onPressed: () {
-                    // Add your submit logic here
-                  },
-                  child: Padding(
-                    padding: EdgeInsets.symmetric(
-                        horizontal: ButtonStyles.paddingwidth(context),
-                        vertical: ButtonStyles.paddingheight(context)),
+      body: Column(
+        children: [
+          // Fixed Title
+          Padding(
+            padding: EdgeInsets.symmetric(
+              horizontal: DeviceStyles.screenWidth(context) * 0.05,
+              vertical: DeviceStyles.screenHeight(context) * 0.02,
+            ),
+            child: Row(
+              children: [
+                Expanded(
+                  child: Center(
                     child: Text(
-                      'Submit',
+                      'Check List',
                       style: TextStyle(
-                        fontSize: DeviceStyles.screenWidth(context) * 0.04,
-                        color: Colors.white,
+                        fontSize: DeviceStyles.screenWidth(context) * 0.06,
+                        fontWeight: FontWeight.bold,
                       ),
                     ),
                   ),
                 ),
-              ),
-              SizedBox(height: DeviceStyles.screenHeight(context) * 0.02),
-            ],
+                SizedBox(width: DeviceStyles.screenWidth(context) * 0.1),
+              ],
+            ),
           ),
-        ),
+          SizedBox(height: DeviceStyles.screenHeight(context) * 0.06),
+          // Scrollable Content
+          Expanded(
+            child: SingleChildScrollView(
+              padding: EdgeInsets.symmetric(
+                horizontal: DeviceStyles.screenWidth(context) * 0.08,
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Insurance Section
+                  _buildSectionTitle('Insurances'),
+                  _buildCheckboxItem('Departure Insurance', departureInsurance,
+                      (value) {
+                    setState(() {
+                      departureInsurance = value ?? false;
+                    });
+                  }, () => _showItemDialog('Departure Insurance')),
+                  _buildCheckboxItem('Expense Insurance', expenseInsurance,
+                      (value) {
+                    setState(() {
+                      expenseInsurance = value ?? false;
+                    });
+                  }, () => _showItemDialog('Expense Insurance')),
+                  _buildCheckboxItem('Surety Insurance', suretyInsurance,
+                      (value) {
+                    setState(() {
+                      suretyInsurance = value ?? false;
+                    });
+                  }, () => _showItemDialog('Surety Insurance')),
+                  _buildCheckboxItem('Accident Insurance', accidentInsurance,
+                      (value) {
+                    setState(() {
+                      accidentInsurance = value ?? false;
+                    });
+                  }, () => _showItemDialog('Accident Insurance')),
+                  const Divider(),
+
+                  // Documents Section
+                  _buildSectionTitle('Documents'),
+                  _buildCheckboxItem('Custom Declaration', customDeclaration,
+                      (value) {
+                    setState(() {
+                      customDeclaration = value ?? false;
+                    });
+                  }, () => _showItemDialog('Custom Declaration')),
+                  _buildCheckboxItem(
+                      'Retirement Allowance', retirementAllowance, (value) {
+                    setState(() {
+                      retirementAllowance = value ?? false;
+                    });
+                  }, () => _showItemDialog('Retirement Allowance')),
+                  const Divider(),
+
+                  // Education Programs Section
+                  _buildSectionTitle('Education Programs'),
+                  _buildCheckboxItem(
+                      'Repatriation Support', repatriationSupport, (value) {
+                    setState(() {
+                      repatriationSupport = value ?? false;
+                    });
+                  }, () => _showItemDialog('Repatriation Support')),
+                  _buildCheckboxItem(
+                      'Foreign Worker Training', foreignWorkerTraining,
+                      (value) {
+                    setState(() {
+                      foreignWorkerTraining = value ?? false;
+                    });
+                  }, () => _showItemDialog('Foreign Worker Training')),
+                ],
+              ),
+            ),
+          ),
+          // Fixed Submit Button
+          Padding(
+            padding: EdgeInsets.all(DeviceStyles.screenWidth(context) * 0.08),
+            child: SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: ButtonStyles.buttonColor,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(
+                        ButtonStyles.borderradius(context)),
+                  ),
+                ),
+                onPressed: () {
+                  //_submitChecklist();
+                },
+                child: Padding(
+                  padding: EdgeInsets.symmetric(
+                      horizontal: ButtonStyles.paddingwidth(context),
+                      vertical: ButtonStyles.paddingheight(context)),
+                  child: Text(
+                    'Submit',
+                    style: TextStyle(
+                      fontSize: DeviceStyles.screenWidth(context) * 0.04,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

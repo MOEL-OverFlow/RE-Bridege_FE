@@ -56,7 +56,28 @@ class _ChecklistPageState extends State<ChecklistPage> {
           height: 200,
           child: SingleChildScrollView(
             child: Text(
-              "테스트",
+              title == 'Departure Insurance' ||
+                      title == 'Expense Insurance' ||
+                      title == 'Surety Insurance' ||
+                      title == 'Accident Insurance'
+                  ? '''🔎Insurance & Employment Information for Foreign Workers
+1) Check Subscription and Claim Status of Departure Guarantee Insurance & Return Cost Insurance
+Contact: +82-1600-0266 (Samsung Fire & Marine Insurance)
+
+2) Check Subscription and Claim Status of Wage Payment Guarantee Insurance
+Contact: +82-2-777-6689 (Seoul Guarantee Insurance)
+
+Or visit: http://eps.sgic.co.kr
+➡️Enter your Employment Permit Number to check.
+
+🔎 When Does the Employment Contract Take Effect?
+E-9 Visa
+(First-time entry) Date of entry into Korea
+(Re-entry special cases) The next day after being handed over (induction day)
+
+H-2 Visa
+Starting date of employment contract'''
+                  : "테스트",
               style: const TextStyle(
                 color: Colors.black,
                 fontSize: 16,
@@ -122,6 +143,11 @@ class _ChecklistPageState extends State<ChecklistPage> {
                         title == 'Accident Insurance') {
                       _launchUrl(
                           'https://eps.hrdkorea.or.kr/e9/user/intro/intro.do?method=epsInsurances');
+                    } else if (title == 'Custom Declaration') {
+                      _launchUrl(
+                          'https://www.customs.go.kr/incheon_airport/cm/cntnts/cntntsView.do?mi=12547&cntntsId=6688');
+                    } else if (title == 'Severance Pay') {
+                      _launchUrl('https://hrdc.hrdkorea.or.kr/hrdc/104013');
                     }
                   },
                   child: const Text(

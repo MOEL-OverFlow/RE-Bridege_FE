@@ -4,7 +4,7 @@ import 'package:rebridge/shared/styles/button_style.dart';
 import 'package:rebridge/shared/styles/device_styles.dart';
 import '../../shared/styles/logo_styles.dart';
 import '../../shared/styles/background_styles.dart';
-import '../../shared/utils/dialog_util.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class ChecklistPage extends StatefulWidget {
   const ChecklistPage({super.key});
@@ -28,32 +28,103 @@ class _ChecklistPageState extends State<ChecklistPage> {
   bool resettlementSupport = false;
   bool foreignWorkerTraining = false;
 
-  void _showItemDialog(String title) {
-    String content = "테스트";
-    if (title == 'Departure Insurance') {
-      content =
-          '''Purpose: To ease employers' burden of paying severance at once and to prevent illegal stays.
-
-Legal Basis: Article 13 of the Act on Foreign Workers; Article 21 of the Enforcement Decree.
-
-Who Must Enroll: Employers.
-
-Applicable Workplaces: Workplaces employing foreign workers whose remaining period of employment is at least 1 year.
-
-Beneficiaries: Foreign workers.
-
-Enrollment Period & Penalty: Must enroll within 15 days from the start date of the employment contract; fine up to 5 million KRW if not enrolled.
-
-Payment Method: 8.3% of the worker's monthly ordinary wages, deposited monthly.
-
-Benefit Conditions: Paid when a foreign worker who has worked at least 1 year leaves Korea (except temporary departures) or changes status of stay.
-
-Payout Amount: 100.5% to 102.3% of the worker's wages if they have worked at least 1 year and 12 months have passed since the first payment.''';
+  Future<void> _launchUrl(String urlString) async {
+    final Uri url = Uri.parse(urlString);
+    if (!await launchUrl(url)) {
+      throw Exception('Could not launch $url');
     }
-    DialogUtil.showCustomDialog(
-      context,
-      title: title,
-      content: content,
+  }
+
+  void _showItemDialog(String title) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        backgroundColor: const Color(0xFFe9eeff),
+        title: Center(
+          child: Text(
+            title,
+            style: const TextStyle(
+              color: Colors.black,
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+            ),
+            textAlign: TextAlign.center,
+          ),
+        ),
+        content: SizedBox(
+          width: 300,
+          height: 200,
+          child: SingleChildScrollView(
+            child: Text(
+              "테스트",
+              style: const TextStyle(
+                color: Colors.black,
+                fontSize: 16,
+              ),
+              textAlign: TextAlign.left,
+            ),
+          ),
+        ),
+        actionsAlignment: MainAxisAlignment.center,
+        actions: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              SizedBox(
+                width: 120,
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: ButtonStyles.buttonColor,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                  ),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                    if (title == 'Departure Insurance') {
+                      _launchUrl(
+                          'https://impossible-repair-22e.notion.site/Departure-Guarantee-Insurance-1f07c2138e7a806fb081f99fdf1c215f');
+                    }
+                  },
+                  child: const Text(
+                    'Details',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 16,
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 10),
+              SizedBox(
+                width: 120,
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: ButtonStyles.buttonColor,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                  ),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                    if (title == 'Departure Insurance') {
+                      _launchUrl(
+                          'https://eps.hrdkorea.or.kr/e9/user/intro/intro.do?method=epsInsurances');
+                    }
+                  },
+                  child: const Text(
+                    'Website',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 16,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
     );
   }
 

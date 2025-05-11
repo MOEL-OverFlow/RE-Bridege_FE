@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:rebridge/data/api/register_api.dart';
 import 'package:rebridge/shared/providers/user_register_provider.dart';
@@ -57,6 +56,13 @@ class _FinalUserRegisterPageState extends ConsumerState<FinalUserRegisterPage> {
       setState(() {
         selectedImage = File(pickedFile.path);
       });
+
+      final current = ref.read(userRegisterProvider);
+      if (current != null) {
+        ref.read(userRegisterProvider.notifier).state = current.copyWith(
+          imagePath: pickedFile.path,
+        );
+      }
     }
   }
 
@@ -73,25 +79,8 @@ class _FinalUserRegisterPageState extends ConsumerState<FinalUserRegisterPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // 상단 바
               Row(
                 children: [
-                  IconButton(
-                    icon: const Icon(Icons.arrow_back),
-                    onPressed: () async {
-                      final shouldGoBack =
-                          await DialogCancelUtil.showCancelCustomDialog(
-                        context,
-                        title: 'Warn',
-                        content:
-                            'You will need to re-enter your email. Would you like to go back to the previous one though?',
-                      );
-
-                      if (shouldGoBack) {
-                        context.go('/firstRegister');
-                      }
-                    },
-                  ),
                   Expanded(
                     child: Center(
                       child: Text(
@@ -107,8 +96,6 @@ class _FinalUserRegisterPageState extends ConsumerState<FinalUserRegisterPage> {
                 ],
               ),
               SizedBox(height: MediaQuery.of(context).size.height * 0.02),
-
-              // 컨텐츠 박스
               Container(
                 padding:
                     EdgeInsets.all(MediaQuery.of(context).size.width * 0.03),
@@ -120,7 +107,6 @@ class _FinalUserRegisterPageState extends ConsumerState<FinalUserRegisterPage> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // 국적
                     const Text('Nationality'),
                     DropdownButtonFormField<String>(
                       value: selectedNationality,
@@ -134,6 +120,12 @@ class _FinalUserRegisterPageState extends ConsumerState<FinalUserRegisterPage> {
                         setState(() {
                           selectedNationality = value;
                         });
+
+                        final current = ref.read(userRegisterProvider);
+                        if (current != null) {
+                          ref.read(userRegisterProvider.notifier).state =
+                              current.copyWith(nationality: value);
+                        }
                       },
                       decoration: InputDecoration(
                         isDense: true,
@@ -147,8 +139,6 @@ class _FinalUserRegisterPageState extends ConsumerState<FinalUserRegisterPage> {
                       ),
                     ),
                     SizedBox(height: DeviceStyles.screenHeight(context) * 0.02),
-
-                    // 1순위 산업
                     const Text('Primary Industry of Interest'),
                     DropdownButtonFormField<String>(
                       value: selectedPrimaryIndustry,
@@ -162,6 +152,12 @@ class _FinalUserRegisterPageState extends ConsumerState<FinalUserRegisterPage> {
                         setState(() {
                           selectedPrimaryIndustry = value;
                         });
+
+                        final current = ref.read(userRegisterProvider);
+                        if (current != null) {
+                          ref.read(userRegisterProvider.notifier).state =
+                              current.copyWith(primaryIndustry: value);
+                        }
                       },
                       decoration: InputDecoration(
                         filled: true,
@@ -174,8 +170,6 @@ class _FinalUserRegisterPageState extends ConsumerState<FinalUserRegisterPage> {
                       ),
                     ),
                     SizedBox(height: DeviceStyles.screenHeight(context) * 0.02),
-
-                    // 2순위 산업
                     const Text('Secondary Industry of Interest'),
                     DropdownButtonFormField<String>(
                       value: selectedSecondaryIndustry,
@@ -189,6 +183,12 @@ class _FinalUserRegisterPageState extends ConsumerState<FinalUserRegisterPage> {
                         setState(() {
                           selectedSecondaryIndustry = value;
                         });
+
+                        final current = ref.read(userRegisterProvider);
+                        if (current != null) {
+                          ref.read(userRegisterProvider.notifier).state =
+                              current.copyWith(secondaryIndustry: value);
+                        }
                       },
                       decoration: InputDecoration(
                         filled: true,
@@ -201,8 +201,6 @@ class _FinalUserRegisterPageState extends ConsumerState<FinalUserRegisterPage> {
                       ),
                     ),
                     SizedBox(height: DeviceStyles.screenHeight(context) * 0.02),
-
-                    // 이미지
                     const Text('Profile Image'),
                     GestureDetector(
                       onTap: _pickImage,
@@ -228,7 +226,6 @@ class _FinalUserRegisterPageState extends ConsumerState<FinalUserRegisterPage> {
                       ),
                     ),
                     SizedBox(height: DeviceStyles.screenHeight(context) * 0.04),
-
                     SizedBox(
                       width: double.infinity,
                       child: ElevatedButton(
@@ -246,19 +243,6 @@ class _FinalUserRegisterPageState extends ConsumerState<FinalUserRegisterPage> {
                                   );
                                   return;
                                 }
-
-                                ref.read(userRegisterProvider.notifier).state =
-                                    RegisterUser(
-                                  email: userData.email,
-                                  password: userData.password,
-                                  fullName: userData.fullName,
-                                  birth: userData.birth,
-                                  foreignNumber: userData.foreignNumber,
-                                  nationality: selectedNationality,
-                                  primaryIndustry: selectedPrimaryIndustry,
-                                  secondaryIndustry: selectedSecondaryIndustry,
-                                  imagePath: selectedImage?.path,
-                                );
 
                                 final shouldProceed = await DialogCancelUtil
                                     .showCancelCustomDialog(

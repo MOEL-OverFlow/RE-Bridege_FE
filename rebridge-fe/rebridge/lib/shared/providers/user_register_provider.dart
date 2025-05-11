@@ -1,18 +1,15 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-// 회원가입 정보 모델
 class RegisterUser {
   final String email;
   final String password;
   final String fullName;
   final String birth;
   final String foreignNumber;
-
-  // 추가된 필드
-  final String? nationality;
-  final String? primaryIndustry;
-  final String? secondaryIndustry;
-  final String? imagePath;
+  final String nationality;
+  final String primaryIndustry;
+  final String secondaryIndustry;
+  final String imagePath;
 
   RegisterUser({
     required this.email,
@@ -20,13 +17,12 @@ class RegisterUser {
     required this.fullName,
     required this.birth,
     required this.foreignNumber,
-    this.nationality,
-    this.primaryIndustry,
-    this.secondaryIndustry,
-    this.imagePath,
+    required this.nationality,
+    required this.primaryIndustry,
+    required this.secondaryIndustry,
+    required this.imagePath,
   });
 
-  // 복사해서 새로운 객체 생성하는 메서드 (변경 시 사용하면 좋음)
   RegisterUser copyWith({
     String? email,
     String? password,
@@ -52,5 +48,4 @@ class RegisterUser {
   }
 }
 
-// Provider
 final userRegisterProvider = StateProvider<RegisterUser?>((ref) => null);

@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:rebridge/shared/address.dart';
 import '../../shared/utils/dialog_util.dart';
 import '../../shared/providers/auth_provider.dart';
+import 'package:google_sign_in/google_sign_in.dart';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 
 class User {
   final String userId;
@@ -17,6 +21,7 @@ class User {
 }
 
 class LoginApi {
+  static final GoogleSignIn _googleSignIn = GoogleSignIn();
   static final List<User> _fakeUsers = [
     const User(
         userId: '001', username: 'howeve18@gmail.com', password: '12345678'),
@@ -75,6 +80,63 @@ class LoginApi {
         context,
         title: 'Login failed',
         content: 'The ID or password does not match.',
+      );
+    }
+  }
+
+  static Future<void> googlelogin(BuildContext context, WidgetRef ref) async {
+    try {
+      await _googleSignIn.signOut();
+
+      final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
+      if (googleUser == null) {
+        print('[GoogleLogin] ❌ 사용자가 로그인 취소함');
+        return;
+      }
+
+      final googleAuth = await googleUser.authentication;
+      final accessToken = googleAuth.accessToken;
+      final idToken = googleAuth.idToken;
+
+      final response = await http.post(
+        Uri.parse('${Address.baseUrl}/auth/login/google'),
+        headers: {'Content-Type': 'application/json'},
+        body: json.encode({'accessToken': accessToken, 'idToken': idToken}),
+      );
+
+      if (response.statusCode == 200) {
+        final responseData = json.decode(response.body);
+        final role = responseData['role'];
+        print(responseData);
+
+        await ref.read(authProvider.notifier).login();
+
+        if (!context.mounted) return;
+
+        if (role == 'GUEST') {
+          context.go('/secondRegister');
+        } else if (role == 'MEMBER') {
+          context.go('/home');
+        } else {
+          DialogUtil.showCustomDialog(
+            context,
+            title: 'Error',
+            content: 'you are a withdrawn member. you can' 't login.',
+          );
+        }
+      } else {
+        DialogUtil.showCustomDialog(
+          context,
+          title: 'Login Failed',
+          content: '서버 오류로 로그인에 실패했습니다.',
+        );
+      }
+    } catch (e) {
+      print('[GoogleLogin] ❌ 예외 발생: $e');
+      DialogUtil.showCustomDialog(
+        context,
+        title: 'Login Failed',
+        content: 'Google login failed. Please try again.',
       );
     }
   }

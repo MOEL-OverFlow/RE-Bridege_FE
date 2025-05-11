@@ -49,16 +49,6 @@ class _AgreeTermsPageState extends State<AgreeTermsPage> {
           ),
           child: Column(
             children: [
-              Row(
-                children: [
-                  IconButton(
-                    icon: const Icon(Icons.arrow_back),
-                    onPressed: () {
-                      context.go('/membershipguide');
-                    },
-                  ),
-                ],
-              ),
               SizedBox(height: DeviceStyles.screenHeight(context) * 0.02),
               Image.asset(
                 'assets/images/register_logo_imgage.png',
@@ -177,7 +167,7 @@ class _AgreeTermsPageState extends State<AgreeTermsPage> {
                   ),
                   onPressed: (acceptTerms && acceptPersonalInfo)
                       ? () {
-                          context.go('/firstRegister');
+                          context.push('/firstRegister');
                         }
                       : null,
                   child: Padding(

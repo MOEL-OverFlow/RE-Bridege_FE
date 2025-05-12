@@ -23,13 +23,20 @@ class DialogCancelUtil {
             textAlign: TextAlign.center,
           ),
         ),
-        content: Text(
-          content,
-          style: TextStyle(
-            color: Colors.black,
-            fontSize: DeviceStyles.screenWidth(context) * 0.04,
+        content: ConstrainedBox(
+          constraints: BoxConstraints(
+            maxHeight: DeviceStyles.screenHeight(context) * 0.5,
           ),
-          textAlign: TextAlign.center,
+          child: SingleChildScrollView(
+            child: Text(
+              content,
+              style: TextStyle(
+                color: Colors.black,
+                fontSize: DeviceStyles.screenWidth(context) * 0.035,
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ),
         ),
         actionsAlignment: MainAxisAlignment.center,
         actions: [

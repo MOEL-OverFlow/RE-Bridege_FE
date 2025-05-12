@@ -7,6 +7,7 @@ import 'package:rebridge/pages/final_user_register_page.dart';
 import 'package:rebridge/pages/find_ID_page.dart';
 import 'package:rebridge/pages/find_PW_page.dart';
 import 'package:rebridge/pages/first_user_reigster_page.dart';
+import 'package:rebridge/pages/membership_guide2_page.dart';
 import 'package:rebridge/pages/membership_guide_page.dart';
 import 'package:rebridge/pages/my_page.dart';
 import 'package:rebridge/pages/safetymaterial_page.dart';
@@ -36,6 +37,9 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
           path: '/membershipguide',
           builder: (context, state) => const MembershipGuidePage()),
+      GoRoute(
+          path: '/membershipguide2',
+          builder: (context, state) => const MembershipGuide2Page()),
       GoRoute(
           path: '/agreeterms',
           builder: (context, state) => const AgreeTermsPage()),

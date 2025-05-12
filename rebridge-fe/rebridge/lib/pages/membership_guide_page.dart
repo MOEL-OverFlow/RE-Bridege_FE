@@ -132,7 +132,7 @@ class MembershipGuidePage extends StatelessWidget {
                     ),
                   ),
                   onPressed: () {
-                    context.push('/agreeterms');
+                    context.push('/membershipguide2');
                   },
                   child: Padding(
                     padding: EdgeInsets.symmetric(

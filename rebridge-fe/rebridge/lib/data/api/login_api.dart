@@ -4,10 +4,10 @@ import 'package:go_router/go_router.dart';
 import 'package:rebridge/shared/address.dart';
 import 'package:rebridge/shared/providers/user_register_provider.dart';
 import '../../shared/utils/dialog_util.dart';
-import '../../shared/providers/auth_provider.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:rebridge/shared/providers/auth_provider.dart';
 
 class User {
   final String userId;
@@ -23,20 +23,6 @@ class User {
 
 class LoginApi {
   static final GoogleSignIn _googleSignIn = GoogleSignIn();
-  static final List<User> _fakeUsers = [
-    const User(
-        userId: '001', username: 'howeve18@gmail.com', password: '12345678'),
-    const User(
-        userId: '002', username: 'butqqt5298@naver.com', password: '12345678'),
-    const User(
-        userId: '003',
-        username: 'minsoo030232@gmail.com',
-        password: '12345678'),
-    const User(
-        userId: '004', username: '5310009@naver.com', password: '12345678'),
-    const User(userId: '005', username: 'flutterdev', password: 'flutter123'),
-    const User(userId: '007', username: 'qwer', password: '123'),
-  ];
 
   static Future<void> normallogin(
     BuildContext context,
@@ -44,8 +30,6 @@ class LoginApi {
     String pw,
     WidgetRef ref,
   ) async {
-    await Future.delayed(const Duration(milliseconds: 500));
-
     if (id.isEmpty || pw.isEmpty) {
       if (!context.mounted) return;
       DialogUtil.showCustomDialog(
@@ -57,31 +41,53 @@ class LoginApi {
     }
 
     try {
-      _fakeUsers.firstWhere(
-        (u) => u.username == id && u.password == pw,
-        orElse: () => throw Exception('The ID or password does not match.'),
+      final response = await http.post(
+        Uri.parse('${Address.baseUrl}/auth/login/local'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({
+          'email': id,
+          'password': pw,
+        }),
       );
+      if (response.statusCode == 200) {
+        final responseData = jsonDecode(response.body);
+        final accessToken = responseData['accessToken'];
+        final refreshToken = responseData['refreshToken'];
 
-      await ref.read(authProvider.notifier).login();
-      print('[LoginApi] 로그인 성공: $id');
+        await ref.read(authProvider.notifier).login(
+              accessToken: accessToken,
+              refreshToken: refreshToken,
+            );
 
-      if (!context.mounted) return;
-      DialogUtil.showCustomDialog(
-        context,
-        title: 'Login successful',
-        content: 'Login successful.',
-        onConfirm: () {
-          Navigator.of(context).pop();
-          context.go('/home');
-        },
-      );
+        print('[LoginApi] 로그인 성공: $id');
+        print('$accessToken');
+        if (!context.mounted) return;
+
+        DialogUtil.showCustomDialog(
+          context,
+          title: 'Login successful',
+          content: 'Login successful.',
+          onConfirm: () {
+            Navigator.of(context).pop();
+            context.go('/home');
+          },
+        );
+      } else {
+        print('[LoginApi] 로그인 실패: ${response.body}');
+        if (!context.mounted) return;
+        DialogUtil.showCustomDialog(
+          context,
+          title: 'Login failed',
+          content: 'The ID or password does not match.',
+        );
+      }
     } catch (e) {
-      print('[LoginApi] 로그인 실패: $id / 이유: $e');
+      print('[LoginApi] 로그인 에러: $e');
       if (!context.mounted) return;
       DialogUtil.showCustomDialog(
         context,
-        title: 'Login failed',
-        content: 'The ID or password does not match.',
+        title: 'Network Error',
+        content: 'Unable to connect to the server.',
       );
     }
   }
@@ -148,7 +154,7 @@ class LoginApi {
             content: 'Welcome!',
             onConfirm: () {
               Navigator.of(context).pop();
-              ref.read(authProvider.notifier).login();
+              // ref.read(authProvider.notifier).login();
               context.push('/home');
             },
           );

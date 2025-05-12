@@ -113,7 +113,10 @@ class _FirstUserRegisterPageState extends ConsumerState<FirstUserRegisterPage> {
 
   Future<void> _codeConfirm() async {
     final certificationCode = verificationCodeController.text;
-    final result = await RegisterApi.verifyCode(context, certificationCode);
+    final emailId = emailIdController.text;
+    final emailDomain = emailDomainController.text;
+    final result = await RegisterApi.verifyCode(
+        context, certificationCode, emailId, emailDomain);
 
     if (result) {
       setState(() {

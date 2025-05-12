@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import 'package:rebridge/data/api/Find_api.dart';
 import 'package:rebridge/shared/styles/background_styles.dart';
 import 'package:rebridge/shared/styles/device_styles.dart';
@@ -51,12 +50,6 @@ class _FindIdPageState extends State<FindIdPage> {
             children: [
               Row(
                 children: [
-                  IconButton(
-                    icon: const Icon(Icons.arrow_back),
-                    onPressed: () {
-                      context.go('/login');
-                    },
-                  ),
                   Expanded(
                     child: Center(
                       child: Text(
@@ -68,7 +61,6 @@ class _FindIdPageState extends State<FindIdPage> {
                       ),
                     ),
                   ),
-                  SizedBox(width: DeviceStyles.screenWidth(context) * 0.1),
                 ],
               ),
               SizedBox(height: DeviceStyles.screenHeight(context) * 0.04),

@@ -18,9 +18,14 @@ class AuthNotifier extends StateNotifier<bool> {
     print('[AuthNotifier] 초기 로그인 상태: $state');
   }
 
-  Future<void> login() async {
+  Future<void> login({
+    required String accessToken,
+    required String refreshToken,
+  }) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool('isLoggedIn', true);
+    await prefs.setString('accessToken', accessToken);
+    await prefs.setString('refreshToken', refreshToken);
     state = true;
 
     print('[AuthNotifier] 로그인 완료 - isLoggedIn: $state');
@@ -29,8 +34,20 @@ class AuthNotifier extends StateNotifier<bool> {
   Future<void> logout() async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool('isLoggedIn', false);
+    await prefs.remove('accessToken');
+    await prefs.remove('refreshToken');
     state = false;
 
     print('[AuthNotifier] 로그아웃 완료 - isLoggedIn: $state');
+  }
+
+  Future<String?> getAccessToken() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString('accessToken');
+  }
+
+  Future<String?> getRefreshToken() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString('refreshToken');
   }
 }

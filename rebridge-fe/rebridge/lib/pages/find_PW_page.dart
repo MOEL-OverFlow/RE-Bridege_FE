@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import 'package:rebridge/data/api/Find_api.dart';
 import 'package:rebridge/shared/styles/background_styles.dart';
 import 'package:rebridge/shared/styles/device_styles.dart';
@@ -17,6 +16,8 @@ class _FindPwPageState extends State<FindPWPage> {
   final TextEditingController emailController = TextEditingController();
   final TextEditingController nameController = TextEditingController();
   final TextEditingController birthController = TextEditingController();
+  final TextEditingController registrationnumberController =
+      TextEditingController();
 
   Future<void> _findPw() async {
     final email = emailController.text.trim();
@@ -40,12 +41,6 @@ class _FindPwPageState extends State<FindPWPage> {
             children: [
               Row(
                 children: [
-                  IconButton(
-                    icon: const Icon(Icons.arrow_back),
-                    onPressed: () {
-                      context.go('/login');
-                    },
-                  ),
                   Expanded(
                     child: Center(
                       child: Text(
@@ -57,7 +52,6 @@ class _FindPwPageState extends State<FindPWPage> {
                       ),
                     ),
                   ),
-                  SizedBox(width: DeviceStyles.screenWidth(context) * 0.1),
                 ],
               ),
               SizedBox(height: DeviceStyles.screenHeight(context) * 0.04),
@@ -74,6 +68,21 @@ class _FindPwPageState extends State<FindPWPage> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    const Text('Foreigner' ' registration number'),
+                    SizedBox(height: DeviceStyles.screenHeight(context) * 0.01),
+                    TextField(
+                      controller: registrationnumberController,
+                      decoration: InputDecoration(
+                        filled: true,
+                        fillColor: const Color(0xFFE7EBFF),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.all(Radius.circular(
+                              ButtonStyles.borderradius(context))),
+                          borderSide: BorderSide.none,
+                        ),
+                      ),
+                    ),
+                    SizedBox(height: DeviceStyles.screenHeight(context) * 0.02),
                     const Text('Email'),
                     SizedBox(height: DeviceStyles.screenHeight(context) * 0.01),
                     TextField(

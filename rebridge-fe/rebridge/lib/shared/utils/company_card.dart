@@ -1,13 +1,47 @@
 import 'package:flutter/material.dart';
-import 'package:rebridge/shared/styles/background_styles.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:rebridge/shared/styles/button_style.dart';
 import 'package:rebridge/shared/styles/device_styles.dart';
-import 'package:rebridge/shared/utils/dialog_util.dart';
+import 'package:rebridge/shared/utils/skeletonLine.dart';
 
-class CompanyCard extends StatelessWidget {
+class CompanyCard extends StatefulWidget {
   final Map<String, String> company;
+  final bool isLoading;
 
-  const CompanyCard({super.key, required this.company});
+  const CompanyCard({
+    super.key,
+    required this.company,
+    this.isLoading = false,
+  });
+
+  @override
+  State<CompanyCard> createState() => _CompanyCardState();
+}
+
+class _CompanyCardState extends State<CompanyCard> {
+  late bool isBookmarked;
+
+  @override
+  void initState() {
+    super.initState();
+    isBookmarked = widget.company['bookMark'] == 'true';
+  }
+
+  void toggleBookmark() {
+    setState(() {
+      isBookmarked = !isBookmarked;
+      widget.company['bookMark'] = isBookmarked.toString();
+    });
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          isBookmarked ? 'Added to bookmarks' : 'Removed from bookmarks',
+        ),
+        duration: const Duration(seconds: 1),
+      ),
+    );
+  }
 
   String formatEnumValue(String? value) {
     if (value == null || value.isEmpty) return '';
@@ -18,7 +52,7 @@ class CompanyCard extends StatelessWidget {
         .join(' ');
   }
 
-  Widget _infoRow(IconData icon, String label, BuildContext context) {
+  Widget _infoRow(IconData icon, String? value, BuildContext context) {
     return Padding(
       padding: const EdgeInsets.only(top: 4),
       child: Row(
@@ -29,11 +63,13 @@ class CompanyCard extends StatelessWidget {
               color: Colors.black54),
           const SizedBox(width: 6),
           Expanded(
-            child: Text(
-              label,
-              style: const TextStyle(fontSize: 13, color: Colors.black87),
-              overflow: TextOverflow.ellipsis,
-            ),
+            child: widget.isLoading
+                ? const SkeletonLine(width: 30, height: 20)
+                : Text(
+                    value ?? '',
+                    style: const TextStyle(fontSize: 13, color: Colors.black87),
+                    overflow: TextOverflow.ellipsis,
+                  ),
           ),
         ],
       ),
@@ -42,78 +78,107 @@ class CompanyCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: () {
-        DialogUtil.showCustomDialog(
-          context,
-          title: company['name'] ?? 'Detail',
-          content: 'More information about ${company['name'] ?? ''}',
-        );
-      },
-      child: Container(
-        padding: EdgeInsets.all(DeviceStyles.screenWidth(context) * 0.04),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius:
-              BorderRadius.circular(ButtonStyles.borderradius(context)),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.05),
-              blurRadius: 6,
-              offset: const Offset(0, 4),
-            ),
-          ],
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // 헤더
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Expanded(
-                  child: Text(
-                    company['name'] ?? '',
-                    style: const TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 16,
-                    ),
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ),
-                const SizedBox(width: 8),
-                Text(
-                  company['field'] ?? '',
-                  style: const TextStyle(
-                    color: Colors.black45,
-                    fontSize: 10,
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 8),
+    final company = widget.company;
 
-            // 정보 라인
-            _infoRow(
-                Icons.flag, 'Country: ${company['country'] ?? ''}', context),
-            _infoRow(Icons.work_outline,
-                'Job Type: ${formatEnumValue(company['jobType'])}', context),
-            _infoRow(
-                Icons.factory,
-                'Industry Type: ${formatEnumValue(company['industryType'])}',
-                context),
-            _infoRow(
-                Icons.timeline,
-                'Experience: ${formatEnumValue(company['experience'])}',
-                context),
-            _infoRow(
-                Icons.language,
-                'Korean Skill: ${formatEnumValue(company['koreanSkill'])}',
-                context),
-            _infoRow(Icons.calendar_today,
-                'Deadline: ${company['deadline'] ?? ''}', context),
-          ],
-        ),
+    return Container(
+      padding: EdgeInsets.all(DeviceStyles.screenWidth(context) * 0.04),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(ButtonStyles.borderradius(context)),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 6,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // 헤더
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Expanded(
+                child: widget.isLoading
+                    ? const SkeletonLine(width: 120, height: 20)
+                    : Text(
+                        company['name'] ?? '',
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                        ),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+              ),
+              const SizedBox(width: 8),
+              widget.isLoading
+                  ? const SkeletonLine(width: 40, height: 10)
+                  : Text(
+                      company['field'] ?? '',
+                      style: const TextStyle(
+                        color: Colors.black45,
+                        fontSize: 10,
+                      ),
+                    ),
+            ],
+          ),
+          const SizedBox(height: 8),
+
+          // 정보
+          _infoRow(Icons.flag, 'Country: ${company['country']}', context),
+          _infoRow(Icons.work_outline,
+              'Job Type: ${formatEnumValue(company['jobType'])}', context),
+          _infoRow(
+              Icons.factory,
+              'Industry Type: ${formatEnumValue(company['industryType'])}',
+              context),
+          _infoRow(Icons.timeline,
+              'Experience: ${formatEnumValue(company['experience'])}', context),
+          _infoRow(
+              Icons.language,
+              'Korean Skill: ${formatEnumValue(company['koreanSkill'])}',
+              context),
+          _infoRow(Icons.calendar_today, 'Deadline: ${company['deadline']}',
+              context),
+
+          const SizedBox(height: 12),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              ElevatedButton.icon(
+                onPressed: () async {
+                  final url = company['url'];
+                  if (url != null && url.isNotEmpty) {
+                    final uri = Uri.tryParse(url);
+                    if (uri != null && await canLaunchUrl(uri)) {
+                      await launchUrl(uri);
+                    } else {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('Cannot launch URL')),
+                      );
+                    }
+                  }
+                },
+                icon: const Icon(Icons.link),
+                label: const Text('Detail Link'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF729BFF),
+                  foregroundColor: Colors.white,
+                  elevation: 0,
+                ),
+              ),
+              IconButton(
+                onPressed: toggleBookmark,
+                icon: Icon(
+                  isBookmarked ? Icons.bookmark : Icons.bookmark_border,
+                  color: isBookmarked ? Colors.blueAccent : Colors.grey,
+                ),
+              ),
+            ],
+          ),
+        ],
       ),
     );
   }

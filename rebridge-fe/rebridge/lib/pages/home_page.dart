@@ -5,6 +5,7 @@ import 'package:rebridge/shared/styles/background_styles.dart';
 import 'package:rebridge/shared/styles/button_style.dart';
 import 'package:rebridge/shared/styles/device_styles.dart';
 import 'package:rebridge/shared/utils/company_card.dart';
+import 'package:rebridge/shared/utils/skeletonLine.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class HomePage extends ConsumerStatefulWidget {
@@ -32,6 +33,7 @@ class _HomePageState extends ConsumerState<HomePage> {
       'industryType': 'CONSTRUCTION',
       'experience': 'ENTRY',
       'koreanSkill': 'MEDIUM',
+      'bookMark': 'true'
     },
     {
       'name': 'XYZ Electronics',
@@ -46,6 +48,7 @@ class _HomePageState extends ConsumerState<HomePage> {
       'industryType': 'MANUFACTURING',
       'experience': 'NONE',
       'koreanSkill': 'LOW',
+      'bookMark': 'true'
     },
     {
       'name': 'Green Foods',
@@ -60,6 +63,7 @@ class _HomePageState extends ConsumerState<HomePage> {
       'industryType': 'AGRICULTURE_FORESTRY_FISHERY',
       'experience': 'EXPERIENCED',
       'koreanSkill': 'HIGH',
+      'bookMark': 'true'
     },
     {
       'name': 'Sky Telecom',
@@ -74,6 +78,7 @@ class _HomePageState extends ConsumerState<HomePage> {
       'industryType': 'MEDIA_COMMUNICATION',
       'experience': 'NONE',
       'koreanSkill': 'MEDIUM',
+      'bookMark': 'true'
     },
     {
       'name': 'Ocean Fishery',
@@ -88,6 +93,7 @@ class _HomePageState extends ConsumerState<HomePage> {
       'industryType': 'FISHERY',
       'experience': 'EXPERIENCED',
       'koreanSkill': 'LOW',
+      'bookMark': 'false'
     },
   ];
 
@@ -136,9 +142,8 @@ class _HomePageState extends ConsumerState<HomePage> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     GestureDetector(
-                      onTap: () => context.push('/mypage'),
-                      child: _buildProfileCard(context),
-                    ),
+                        onTap: () => context.push('/mypage'),
+                        child: _buildProfileCard(context, isLoading: true)),
                     SizedBox(height: DeviceStyles.screenHeight(context) * 0.03),
                     const Text(
                       'Recommended Job Postings',
@@ -146,7 +151,7 @@ class _HomePageState extends ConsumerState<HomePage> {
                     ),
                     SizedBox(height: DeviceStyles.screenHeight(context) * 0.01),
                     SizedBox(
-                      height: DeviceStyles.screenHeight(context) * 0.35,
+                      height: DeviceStyles.screenHeight(context) * 0.43,
                       child: Column(
                         children: [
                           Expanded(
@@ -161,8 +166,8 @@ class _HomePageState extends ConsumerState<HomePage> {
                                   padding:
                                       const EdgeInsets.symmetric(horizontal: 6),
                                   child: CompanyCard(
-                                    company: companySamples[index],
-                                  ),
+                                      company: companySamples[index],
+                                      isLoading: false),
                                 );
                               },
                             ),
@@ -206,7 +211,7 @@ class _HomePageState extends ConsumerState<HomePage> {
     );
   }
 
-  Widget _buildProfileCard(BuildContext context) {
+  Widget _buildProfileCard(BuildContext context, {bool isLoading = false}) {
     return Container(
       width: double.infinity,
       padding: EdgeInsets.all(DeviceStyles.screenWidth(context) * 0.03),
@@ -243,13 +248,16 @@ class _HomePageState extends ConsumerState<HomePage> {
                           size: DeviceStyles.screenWidth(context) * 0.05),
                       SizedBox(
                           width: DeviceStyles.screenWidth(context) * 0.005),
-                      Text(
-                        'Full Name',
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: DeviceStyles.screenWidth(context) * 0.035,
-                        ),
-                      ),
+                      isLoading
+                          ? const SkeletonLine(width: 80, height: 14)
+                          : Text(
+                              'Full Name',
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize:
+                                    DeviceStyles.screenWidth(context) * 0.035,
+                              ),
+                            ),
                     ],
                   ),
                 ],
@@ -267,8 +275,22 @@ class _HomePageState extends ConsumerState<HomePage> {
                       ),
                     ),
                     SizedBox(height: DeviceStyles.screenHeight(context) * 0.01),
-                    const Text('1. industry 1'),
-                    const Text('2. industry 2'),
+                    isLoading
+                        ? const Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              SkeletonLine(width: 80, height: 10),
+                              SizedBox(height: 6),
+                              SkeletonLine(width: 80, height: 10),
+                            ],
+                          )
+                        : const Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text('1. industry 1'),
+                              Text('2. industry 2'),
+                            ],
+                          ),
                   ],
                 ),
               )

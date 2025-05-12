@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:rebridge/data/api/JobPosting_api.dart';
 import 'package:rebridge/shared/styles/background_styles.dart';
 import 'package:rebridge/shared/styles/button_style.dart';
 import 'package:rebridge/shared/styles/device_styles.dart';
@@ -12,78 +13,8 @@ class CompanyListPage extends StatefulWidget {
 }
 
 class _CompanyListPageState extends State<CompanyListPage> {
-  final List<Map<String, String>> companyList = [
-    {
-      'name': 'ABC Construction',
-      'field': 'CONSTRUCTION',
-      'country': 'Korea',
-      'recruit': '10',
-      'career': '1+ years',
-      'language': 'Basic',
-      'deadline': '2025-06-30',
-      'url': '',
-      'jobType': 'PRODUCTION_MANAGEMENT',
-      'industryType': 'CONSTRUCTION',
-      'experience': 'ENTRY',
-      'koreanSkill': 'MEDIUM',
-    },
-    {
-      'name': 'XYZ Electronics',
-      'field': 'ELECTRONIC',
-      'country': 'Vietnam',
-      'recruit': '5',
-      'career': 'Any',
-      'language': 'Intermediate',
-      'deadline': '2025-07-15',
-      'url': '',
-      'jobType': 'INTERPRET',
-      'industryType': 'MANUFACTURING',
-      'experience': 'NONE',
-      'koreanSkill': 'LOW',
-    },
-    {
-      'name': 'Green Foods',
-      'field': 'FOOD',
-      'country': 'Uzbekistan',
-      'recruit': '3',
-      'career': '2+ years',
-      'language': 'Advanced',
-      'deadline': '2025-06-01',
-      'url': '',
-      'jobType': 'CLERICAL_WORK',
-      'industryType': 'AGRICULTURE_FORESTRY_FISHERY',
-      'experience': 'EXPERIENCED',
-      'koreanSkill': 'HIGH',
-    },
-    {
-      'name': 'Sky Telecom',
-      'field': 'TELECOMMUNICATIONS',
-      'country': 'Nepal',
-      'recruit': '4',
-      'career': 'Any',
-      'language': 'Basic',
-      'deadline': '2025-06-20',
-      'url': '',
-      'jobType': 'BUSINESS_MANAGEMENT',
-      'industryType': 'MEDIA_COMMUNICATION',
-      'experience': 'NONE',
-      'koreanSkill': 'MEDIUM',
-    },
-    {
-      'name': 'Ocean Fishery',
-      'field': 'FISHERY',
-      'country': 'Thailand',
-      'recruit': '8',
-      'career': '3+ years',
-      'language': 'Intermediate',
-      'deadline': '2025-08-10',
-      'url': '',
-      'jobType': 'PRODUCTION_MANAGEMENT',
-      'industryType': 'FISHERY',
-      'experience': 'EXPERIENCED',
-      'koreanSkill': 'LOW',
-    },
-  ]; // 생략 (기존 리스트 유지)
+  List<Map<String, String>> companyList = [];
+  bool isLoading = false;
 
   String? selectedCountry;
   String? selectedField;
@@ -127,7 +58,8 @@ class _CompanyListPageState extends State<CompanyListPage> {
     'STOCKBREEDING',
     'FISHERY',
     'WOODWORK',
-    'TRANSPORT'
+    'TRANSPORT',
+    'NONE'
   ];
 
   final List<String> jobTypeOptions = [
@@ -167,6 +99,34 @@ class _CompanyListPageState extends State<CompanyListPage> {
   bool showFilters = false;
 
   @override
+  void initState() {
+    super.initState();
+    _fetchJobPostings();
+  }
+
+  Future<void> _fetchJobPostings() async {
+    final postings = await JobPostingApi.fetchJobPostings();
+    setState(() {
+      companyList = postings
+          .map((e) => {
+                'name': e.companyName,
+                'field': e.field,
+                'jobType': e.jobType,
+                'url': e.detailUrl,
+                'industryType': e.industryType,
+                'country': e.nation,
+                'recruit': e.recruitmentCount.toString(),
+                'experience': e.experience,
+                'koreanSkill': e.koreanSkillLevel,
+                'deadline': e.deadline,
+                'bookMark': e.isBookmark.toString(),
+              })
+          .toList();
+      isLoading = false;
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: BackgroundStyles.backgroundColor,
@@ -187,21 +147,27 @@ class _CompanyListPageState extends State<CompanyListPage> {
                 ),
               ),
               const SizedBox(height: 16),
-              ElevatedButton(
-                onPressed: () {
-                  setState(() => showFilters = !showFilters);
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF729BFF),
-                  foregroundColor: Colors.white,
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: () {
+                    setState(() => showFilters = !showFilters);
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: ButtonStyles.buttonColor,
+                    foregroundColor: Colors.white,
+                    padding: EdgeInsets.symmetric(
+                      horizontal: ButtonStyles.paddingwidth(context),
+                      vertical: ButtonStyles.paddingheight(context),
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(
+                          ButtonStyles.borderradius(context)),
+                    ),
+                    elevation: 0,
                   ),
-                  elevation: 0,
+                  child: const Text('Filter'),
                 ),
-                child: const Text('Filter'),
               ),
               AnimatedSize(
                 duration: const Duration(milliseconds: 300),
@@ -255,26 +221,29 @@ class _CompanyListPageState extends State<CompanyListPage> {
                               ],
                             ),
                             const SizedBox(height: 10),
-                            ElevatedButton(
-                              onPressed: () {
-                                print('Country: $selectedCountry');
-                                print('Field: $selectedField');
-                                print('Job Type: $selectedJobType');
-                                print('Industry Type: $selectedIndustryType');
-                                print('Experience: $selectedExperience');
-                                print('Korean Skill: $selectedKoreanSkill');
-                              },
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: const Color(0xFF4AD0C7),
-                                foregroundColor: Colors.white,
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 24, vertical: 12),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(12),
+                            SizedBox(
+                              width: double.infinity,
+                              child: ElevatedButton(
+                                onPressed: () {
+                                  print('Country: $selectedCountry');
+                                  print('Field: $selectedField');
+                                  print('Job Type: $selectedJobType');
+                                  print('Industry Type: $selectedIndustryType');
+                                  print('Experience: $selectedExperience');
+                                  print('Korean Skill: $selectedKoreanSkill');
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: const Color(0xFF4AD0C7),
+                                  foregroundColor: Colors.white,
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 24, vertical: 12),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                  elevation: 0,
                                 ),
-                                elevation: 0,
+                                child: const Text('Search'),
                               ),
-                              child: const Text('Search'),
                             ),
                           ],
                         )
@@ -283,16 +252,27 @@ class _CompanyListPageState extends State<CompanyListPage> {
               ),
               const SizedBox(height: 16),
               Expanded(
-                child: ListView.builder(
-                  itemCount: companyList.length,
-                  itemBuilder: (context, index) {
-                    final company = companyList[index];
-                    return Padding(
-                      padding: const EdgeInsets.only(bottom: 12),
-                      child: CompanyCard(company: company),
-                    );
-                  },
-                ),
+                child: isLoading
+                    ? ListView.builder(
+                        itemCount: 5,
+                        itemBuilder: (context, index) => const Padding(
+                          padding: EdgeInsets.only(bottom: 12),
+                          child: CompanyCard(
+                            company: {},
+                            isLoading: true,
+                          ),
+                        ),
+                      )
+                    : ListView.builder(
+                        itemCount: companyList.length,
+                        itemBuilder: (context, index) {
+                          final company = companyList[index];
+                          return Padding(
+                            padding: const EdgeInsets.only(bottom: 12),
+                            child: CompanyCard(company: company),
+                          );
+                        },
+                      ),
               ),
             ],
           ),

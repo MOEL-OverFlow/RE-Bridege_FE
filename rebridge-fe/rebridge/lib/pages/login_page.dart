@@ -225,7 +225,7 @@ class LoginPageState extends ConsumerState<LoginPage> {
                   children: [
                     TextButton(
                       onPressed: () {
-                        context.go('/findId');
+                        context.push('/findId');
                       },
                       child: const Text(
                         'Find ID',
@@ -243,7 +243,7 @@ class LoginPageState extends ConsumerState<LoginPage> {
                     ),
                     TextButton(
                       onPressed: () {
-                        context.go('/findPw');
+                        context.push('/findPw');
                       },
                       child: const Text(
                         'Find PW',

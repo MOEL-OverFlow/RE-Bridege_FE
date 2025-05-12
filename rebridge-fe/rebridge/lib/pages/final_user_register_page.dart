@@ -26,26 +26,42 @@ class _FinalUserRegisterPageState extends ConsumerState<FinalUserRegisterPage> {
   File? selectedImage;
 
   final List<String> nationalityOptions = [
-    'Korea',
-    'Vietnam',
-    'Philippines',
-    'Indonesia',
-    'China',
-    'Thailand',
-    'USA',
-    'Other'
+    'BANGLADESH',
+    'CAMBODIA',
+    'CHINA',
+    'INDONESIA',
+    'KYRGYZ',
+    'LAOS',
+    'MONGOLIA',
+    'MYANMAR',
+    'NEPAL',
+    'PAKISTAN',
+    'PHILIPPINES',
+    'SRI_LANKA',
+    'THAILAND',
+    'TIMOR_LESTE',
+    'UZBEKISTAN',
+    'VIETNAM',
+    'SOUTH_KOREA',
+    'OTHER'
   ];
 
   final List<String> industryOptions = [
-    'Manufacturing',
-    'Construction',
-    'IT & Software',
-    'Healthcare',
-    'Education',
-    'Agriculture',
-    'Retail',
-    'Finance',
-    'Other'
+    'CONSTRUCTION',
+    'METAL',
+    'MACHINE',
+    'ELECTRICITY',
+    'ELECTRONIC',
+    'TELECOMMUNICATIONS',
+    'TEXTILE',
+    'CHEMICALS',
+    'FOOD',
+    'AGRICULTURE',
+    'STOCKBREEDING',
+    'FISHERY',
+    'WOODWORK',
+    'TRANSPORT',
+    'NONE'
   ];
 
   Future<void> _pickImage() async {

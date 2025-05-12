@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:rebridge/pages/agree_terms_page.dart';
 import 'package:rebridge/pages/checklist_page.dart';
+import 'package:rebridge/pages/company_list_page.dart';
 import 'package:rebridge/pages/final_user_register_page.dart';
 import 'package:rebridge/pages/find_ID_page.dart';
 import 'package:rebridge/pages/find_PW_page.dart';
@@ -53,7 +54,10 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(path: '/mypage', builder: (context, state) => const MyPage()),
       GoRoute(
           path: '/safetypage',
-          builder: (context, state) => const SafetyMaterialPage())
+          builder: (context, state) => const SafetyMaterialPage()),
+      GoRoute(
+          path: '/companylists',
+          builder: (context, state) => const CompanyListPage())
     ],
   );
 });

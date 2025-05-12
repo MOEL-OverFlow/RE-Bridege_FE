@@ -4,19 +4,106 @@ import 'package:go_router/go_router.dart';
 import 'package:rebridge/shared/styles/background_styles.dart';
 import 'package:rebridge/shared/styles/button_style.dart';
 import 'package:rebridge/shared/styles/device_styles.dart';
+import 'package:rebridge/shared/utils/company_card.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-class HomePage extends ConsumerWidget {
+class HomePage extends ConsumerStatefulWidget {
   const HomePage({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<HomePage> createState() => _HomePageState();
+}
+
+class _HomePageState extends ConsumerState<HomePage> {
+  final PageController _pageController = PageController(viewportFraction: 0.85);
+  int _currentPage = 0;
+
+  final List<Map<String, String>> companySamples = [
+    {
+      'name': 'ABC Construction',
+      'field': 'CONSTRUCTION',
+      'country': 'Korea',
+      'recruit': '10',
+      'career': '1+ years',
+      'language': 'Basic',
+      'deadline': '2025-06-30',
+      'url': '',
+      'jobType': 'PRODUCTION_MANAGEMENT',
+      'industryType': 'CONSTRUCTION',
+      'experience': 'ENTRY',
+      'koreanSkill': 'MEDIUM',
+    },
+    {
+      'name': 'XYZ Electronics',
+      'field': 'ELECTRONIC',
+      'country': 'Vietnam',
+      'recruit': '5',
+      'career': 'Any',
+      'language': 'Intermediate',
+      'deadline': '2025-07-15',
+      'url': '',
+      'jobType': 'INTERPRET',
+      'industryType': 'MANUFACTURING',
+      'experience': 'NONE',
+      'koreanSkill': 'LOW',
+    },
+    {
+      'name': 'Green Foods',
+      'field': 'FOOD',
+      'country': 'Uzbekistan',
+      'recruit': '3',
+      'career': '2+ years',
+      'language': 'Advanced',
+      'deadline': '2025-06-01',
+      'url': '',
+      'jobType': 'CLERICAL_WORK',
+      'industryType': 'AGRICULTURE_FORESTRY_FISHERY',
+      'experience': 'EXPERIENCED',
+      'koreanSkill': 'HIGH',
+    },
+    {
+      'name': 'Sky Telecom',
+      'field': 'TELECOMMUNICATIONS',
+      'country': 'Nepal',
+      'recruit': '4',
+      'career': 'Any',
+      'language': 'Basic',
+      'deadline': '2025-06-20',
+      'url': '',
+      'jobType': 'BUSINESS_MANAGEMENT',
+      'industryType': 'MEDIA_COMMUNICATION',
+      'experience': 'NONE',
+      'koreanSkill': 'MEDIUM',
+    },
+    {
+      'name': 'Ocean Fishery',
+      'field': 'FISHERY',
+      'country': 'Thailand',
+      'recruit': '8',
+      'career': '3+ years',
+      'language': 'Intermediate',
+      'deadline': '2025-08-10',
+      'url': '',
+      'jobType': 'PRODUCTION_MANAGEMENT',
+      'industryType': 'FISHERY',
+      'experience': 'EXPERIENCED',
+      'koreanSkill': 'LOW',
+    },
+  ];
+
+  @override
+  void dispose() {
+    _pageController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: BackgroundStyles.backgroundColor,
       body: SafeArea(
         child: Column(
           children: [
-            // 상단 아이콘 + Re:Bridge
             Padding(
               padding: EdgeInsets.symmetric(
                 horizontal: DeviceStyles.screenWidth(context) * 0.08,
@@ -39,8 +126,6 @@ class HomePage extends ConsumerWidget {
                 ],
               ),
             ),
-
-            // 스크롤 가능한 나머지 내용
             Expanded(
               child: SingleChildScrollView(
                 padding: EdgeInsets.symmetric(
@@ -51,9 +136,7 @@ class HomePage extends ConsumerWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     GestureDetector(
-                      onTap: () {
-                        context.push('/mypage');
-                      },
+                      onTap: () => context.push('/mypage'),
                       child: _buildProfileCard(context),
                     ),
                     SizedBox(height: DeviceStyles.screenHeight(context) * 0.03),
@@ -62,7 +145,51 @@ class HomePage extends ConsumerWidget {
                       style: TextStyle(fontWeight: FontWeight.bold),
                     ),
                     SizedBox(height: DeviceStyles.screenHeight(context) * 0.01),
-                    _buildJobCard(context),
+                    SizedBox(
+                      height: DeviceStyles.screenHeight(context) * 0.35,
+                      child: Column(
+                        children: [
+                          Expanded(
+                            child: PageView.builder(
+                              controller: _pageController,
+                              itemCount: companySamples.length,
+                              onPageChanged: (index) {
+                                setState(() => _currentPage = index);
+                              },
+                              itemBuilder: (context, index) {
+                                return Padding(
+                                  padding:
+                                      const EdgeInsets.symmetric(horizontal: 6),
+                                  child: CompanyCard(
+                                    company: companySamples[index],
+                                  ),
+                                );
+                              },
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: List.generate(
+                              companySamples.length,
+                              (index) => AnimatedContainer(
+                                duration: const Duration(milliseconds: 300),
+                                margin:
+                                    const EdgeInsets.symmetric(horizontal: 4),
+                                width: _currentPage == index ? 12 : 8,
+                                height: _currentPage == index ? 12 : 8,
+                                decoration: BoxDecoration(
+                                  color: _currentPage == index
+                                      ? const Color(0xFF729BFF)
+                                      : Colors.grey.shade400,
+                                  shape: BoxShape.circle,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
                     SizedBox(height: DeviceStyles.screenHeight(context) * 0.03),
                     _buildButtons(context, ref),
                     SizedBox(height: DeviceStyles.screenHeight(context) * 0.03),
@@ -172,42 +299,13 @@ class HomePage extends ConsumerWidget {
     );
   }
 
-  Widget _buildJobCard(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      padding: EdgeInsets.all(DeviceStyles.screenWidth(context) * 0.03),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(ButtonStyles.borderradius(context)),
-      ),
-      child: Column(
-        children: [
-          const Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [Text('현지업체명'), Text('업종 대분류')],
-          ),
-          SizedBox(height: DeviceStyles.screenHeight(context) * 0.01),
-          const Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [Text('🇰🇷 근무 국가'), Text('업종 소분류')],
-          ),
-          SizedBox(height: DeviceStyles.screenHeight(context) * 0.01),
-          const Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [Text('필요 인원 수'), Text('기간')],
-          ),
-        ],
-      ),
-    );
-  }
-
   Widget _buildButtons(BuildContext context, WidgetRef ref) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         ElevatedButton(
           onPressed: () {
-            // 채용 공고 페이지 이동
+            context.push('/companylists');
           },
           style: ElevatedButton.styleFrom(
             backgroundColor: const Color(0xFF729BFF),

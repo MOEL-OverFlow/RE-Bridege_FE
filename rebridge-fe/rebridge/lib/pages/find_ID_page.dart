@@ -20,11 +20,24 @@ class _FindIdPageState extends State<FindIdPage> {
   String? selectedCountry;
 
   final List<String> countries = [
-    'South Korea',
-    'United States',
-    'Japan',
-    'Germany',
-    'Australia'
+    'BANGLADESH',
+    'CAMBODIA',
+    'CHINA',
+    'INDONESIA',
+    'KYRGYZ',
+    'LAOS',
+    'MONGOLIA',
+    'MYANMAR',
+    'NEPAL',
+    'PAKISTAN',
+    'PHILIPPINES',
+    'SRI_LANKA',
+    'THAILAND',
+    'TIMOR_LESTE',
+    'UZBEKISTAN',
+    'VIETNAM',
+    'SOUTH_KOREA',
+    'OTHER',
   ];
 
   Future<void> _findId() async {

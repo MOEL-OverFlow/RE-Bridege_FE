@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 import '../../shared/utils/dialog_util.dart';
+import '../../shared/address.dart';
 
 class FindApi {
   static Future<void> FindId(
@@ -9,67 +12,122 @@ class FindApi {
     String? country,
     BuildContext context,
   ) async {
-    await Future.delayed(const Duration(milliseconds: 500));
+    try {
+      // Request body 생성 - 서버 형식에 맞게 수정
+      final Map<String, dynamic> requestBody = {
+        'foreignerNumber': registrationNumber,
+        'name': name,
+        'nation': country,
+        'birthDate': birth,
+      };
 
-    print('========== [Find ID 요청 값] ==========');
-    print('Name: $name');
-    print('Birth: $birth');
-    print('Registration Number: $registrationNumber');
-    print('Country: $country');
-    print('======================================');
+      // API 엔드포인트 설정
+      final response = await http.post(
+        Uri.parse('${Address.baseUrl}/auth/findId'),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode(requestBody),
+      );
 
-    if (name.isEmpty ||
-        birth.isEmpty ||
-        registrationNumber.isEmpty ||
-        country == null) {
+      if (response.statusCode == 200) {
+        // 성공 응답 처리 - 서버에서 반환된 이메일 표시
+        final String email = response.body; // 서버에서 이메일 문자열을 직접 반환
+
+        if (!context.mounted) return;
+        DialogUtil.showCustomDialog(
+          context,
+          title: 'Success',
+          content: 'Your ID is: $email',
+          onConfirm: () {
+            Navigator.of(context).pop();
+          },
+        );
+      } else {
+        // 에러 응답 처리
+        if (!context.mounted) return;
+        DialogUtil.showCustomDialog(
+          context,
+          title: 'Error',
+          content: 'Failed to find ID. Please try again.',
+          onConfirm: () {
+            Navigator.of(context).pop();
+          },
+        );
+      }
+    } catch (e) {
+      // 예외 처리
+      if (!context.mounted) return;
       DialogUtil.showCustomDialog(
         context,
         title: 'Error',
-        content: 'Please enter all the information.',
+        content: 'An error occurred. Please try again.',
+        onConfirm: () {
+          Navigator.of(context).pop();
+        },
       );
-      return;
     }
-
-    DialogUtil.showCustomDialog(
-      context,
-      title: 'Confirmation completed',
-      content: 'The information you entered has been received successfully.',
-      onConfirm: () {
-        Navigator.of(context).pop();
-      },
-    );
   }
 
   static Future<void> FindPw(
     String email,
     String name,
     String birth,
+    String foreignerNumber,
     BuildContext context,
   ) async {
-    await Future.delayed(const Duration(milliseconds: 500));
+    try {
+      // Request body 생성
+      final Map<String, dynamic> requestBody = {
+        'email': email,
+        'name': name,
+        'foreignerNumber': foreignerNumber,
+        'birthDate': birth,
+      };
 
-    print('========== [Find PW 요청 값] ==========');
-    print('Email : $email');
-    print('Name: $name');
-    print('Birth: $birth');
-    print('======================================');
+      // API 엔드포인트 설정
+      final response = await http.post(
+        Uri.parse('${Address.baseUrl}/auth/reset-password'),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode(requestBody),
+      );
 
-    if (email.isEmpty || name.isEmpty || birth.isEmpty) {
+      if (response.statusCode == 200) {
+        // 성공 응답 처리
+        if (!context.mounted) return;
+        DialogUtil.showCustomDialog(
+          context,
+          title: 'Success',
+          content: 'A temporary password has been sent to your email.',
+          onConfirm: () {
+            Navigator.of(context).pop();
+          },
+        );
+      } else {
+        // 에러 응답 처리
+        if (!context.mounted) return;
+        DialogUtil.showCustomDialog(
+          context,
+          title: 'Error',
+          content: response.body, // 서버에서 반환한 에러 메시지 표시
+          onConfirm: () {
+            Navigator.of(context).pop();
+          },
+        );
+      }
+    } catch (e) {
+      // 예외 처리
+      if (!context.mounted) return;
       DialogUtil.showCustomDialog(
         context,
         title: 'Error',
-        content: 'Please enter all the information.',
+        content: 'An error occurred. Please try again.',
+        onConfirm: () {
+          Navigator.of(context).pop();
+        },
       );
-      return;
     }
-
-    DialogUtil.showCustomDialog(
-      context,
-      title: 'Confirmation completed',
-      content: 'The information you entered has been received successfully.',
-      onConfirm: () {
-        Navigator.of(context).pop();
-      },
-    );
   }
 }

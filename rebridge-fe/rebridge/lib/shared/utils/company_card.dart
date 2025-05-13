@@ -3,7 +3,6 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:rebridge/shared/styles/button_style.dart';
 import 'package:rebridge/shared/styles/device_styles.dart';
 import 'package:rebridge/shared/utils/skeletonLine.dart';
-import 'package:url_launcher/url_launcher_string.dart';
 
 class CompanyCard extends StatefulWidget {
   final Map<String, String> company;
@@ -152,20 +151,41 @@ class _CompanyCardState extends State<CompanyCard> {
                 onPressed: () async {
                   final rawUrl = company['url'];
                   if (rawUrl != null && rawUrl.isNotEmpty) {
-                    final cleanedUrl = rawUrl.replaceAll('&amp;', '&');
-                    final fullUrl = cleanedUrl.startsWith('http')
-                        ? cleanedUrl
-                        : 'https://$cleanedUrl';
-                    final uri = Uri.parse(fullUrl);
+                    try {
+                      // URL 정규화
+                      String cleanedUrl = rawUrl.trim();
+                      cleanedUrl = cleanedUrl.replaceAll('&amp;', '&');
 
-                    print('[URL 버튼 클릭] Cleaned URI: $uri');
+                      // URL이 http:// 또는 https://로 시작하지 않는 경우 https:// 추가
+                      if (!cleanedUrl.startsWith('http://') &&
+                          !cleanedUrl.startsWith('https://')) {
+                        cleanedUrl = 'https://$cleanedUrl';
+                      }
 
-                    if (await canLaunchUrl(uri)) {
-                      await launchUrl(uri,
-                          mode: LaunchMode.externalApplication);
-                    } else {
+                      // 직접 외부 브라우저로 열기
+                      final uri = Uri.parse(cleanedUrl);
+                      await launchUrl(
+                        uri,
+                        mode: LaunchMode.externalApplication,
+                      );
+                    } catch (e) {
+                      if (mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content:
+                                Text('Failed to open URL: ${e.toString()}'),
+                            duration: const Duration(seconds: 2),
+                          ),
+                        );
+                      }
+                    }
+                  } else {
+                    if (mounted) {
                       ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Cannot launch URL')),
+                        const SnackBar(
+                          content: Text('No URL available'),
+                          duration: Duration(seconds: 2),
+                        ),
                       );
                     }
                   }

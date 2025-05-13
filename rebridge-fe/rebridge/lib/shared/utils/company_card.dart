@@ -3,6 +3,8 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:rebridge/shared/styles/button_style.dart';
 import 'package:rebridge/shared/styles/device_styles.dart';
 import 'package:rebridge/shared/utils/skeletonLine.dart';
+import 'package:rebridge/data/api/Bookmark_api.dart';
+import 'package:rebridge/data/api/JobPosting_api.dart';
 
 class CompanyCard extends StatefulWidget {
   final Map<String, String> company;
@@ -27,20 +29,35 @@ class _CompanyCardState extends State<CompanyCard> {
     isBookmarked = widget.company['bookMark'] == 'true';
   }
 
-  void toggleBookmark() {
-    setState(() {
-      isBookmarked = !isBookmarked;
-      widget.company['bookMark'] = isBookmarked.toString();
-    });
+  Future<void> toggleBookmark() async {
+    try {
+      final jobPostingId = widget.company['id'];
+      if (jobPostingId == null) return;
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(
-          isBookmarked ? 'Added to bookmarks' : 'Removed from bookmarks',
+      final success = await BookmarkApi.toggleBookmark(jobPostingId);
+      if (success) {
+        setState(() {
+          isBookmarked = !isBookmarked;
+          widget.company['bookMark'] = isBookmarked.toString();
+        });
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(isBookmarked ? '북마크에 추가되었습니다.' : '북마크에서 제거되었습니다.'),
+            duration: const Duration(seconds: 2),
+          ),
+        );
+      }
+    } catch (e) {
+      print('Error toggling bookmark: $e');
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('북마크 처리 중 오류가 발생했습니다.'),
+          duration: Duration(seconds: 2),
         ),
-        duration: const Duration(seconds: 1),
-      ),
-    );
+      );
+    }
   }
 
   String formatEnumValue(String? value) {

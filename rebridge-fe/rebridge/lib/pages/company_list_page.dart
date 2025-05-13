@@ -111,6 +111,7 @@ class _CompanyListPageState extends State<CompanyListPage> {
     setState(() {
       companyList = postings
           .map((e) => {
+                'id': e.id.toString(),
                 'name': e.companyName,
                 'field': e.field,
                 'jobType': e.jobType,

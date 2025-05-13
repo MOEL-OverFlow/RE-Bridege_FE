@@ -34,7 +34,7 @@ class JobPosting {
 
   factory JobPosting.fromJson(Map<String, dynamic> json) {
     return JobPosting(
-      id: json['id'],
+      id: json['jobPostingId'] ?? json['id'],
       companyName: json['companyName'],
       field: json['field'],
       jobType: json['jobType'],
@@ -48,9 +48,41 @@ class JobPosting {
       isBookmark: json['isBookmark'],
     );
   }
+
+  JobPosting copyWith({
+    int? id,
+    String? companyName,
+    String? field,
+    String? jobType,
+    String? detailUrl,
+    String? industryType,
+    String? nation,
+    int? recruitmentCount,
+    String? experience,
+    String? koreanSkillLevel,
+    String? deadline,
+    bool? isBookmark,
+  }) {
+    return JobPosting(
+      id: id ?? this.id,
+      companyName: companyName ?? this.companyName,
+      field: field ?? this.field,
+      jobType: jobType ?? this.jobType,
+      detailUrl: detailUrl ?? this.detailUrl,
+      industryType: industryType ?? this.industryType,
+      nation: nation ?? this.nation,
+      recruitmentCount: recruitmentCount ?? this.recruitmentCount,
+      experience: experience ?? this.experience,
+      koreanSkillLevel: koreanSkillLevel ?? this.koreanSkillLevel,
+      deadline: deadline ?? this.deadline,
+      isBookmark: isBookmark ?? this.isBookmark,
+    );
+  }
 }
 
 class JobPostingApi {
+  static List<JobPosting> _cachedJobPostings = [];
+
   static Future<List<JobPosting>> fetchJobPostings() async {
     final prefs = await SharedPreferences.getInstance();
     final accessToken = prefs.getString('accessToken');
@@ -69,8 +101,8 @@ class JobPostingApi {
 
     if (response.statusCode == 200) {
       final List<dynamic> data = jsonDecode(response.body);
-      // print(response.body);
-      return data.map((e) => JobPosting.fromJson(e)).toList();
+      _cachedJobPostings = data.map((e) => JobPosting.fromJson(e)).toList();
+      return _cachedJobPostings;
     } else {
       throw Exception('Failed to load job postings: ${response.body}');
     }
@@ -94,12 +126,9 @@ class JobPostingApi {
 
     if (response.statusCode == 200) {
       final List<dynamic> data = jsonDecode(response.body);
-      // print('[JobPostingApi] 추천 공고 불러오기 성공');
-      print(response.body);
-      return data.map((e) => JobPosting.fromJson(e)).toList();
+      _cachedJobPostings = data.map((e) => JobPosting.fromJson(e)).toList();
+      return _cachedJobPostings;
     } else {
-      // print(
-      //     '[JobPostingApi] 추천 공고 실패: ${response.statusCode} / ${response.body}');
       throw Exception(
           'Failed to load recommended job postings: ${response.body}');
     }

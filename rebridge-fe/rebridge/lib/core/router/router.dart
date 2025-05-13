@@ -12,6 +12,7 @@ import 'package:rebridge/pages/membership_guide_page.dart';
 import 'package:rebridge/pages/my_page.dart';
 import 'package:rebridge/pages/safetymaterial_page.dart';
 import 'package:rebridge/pages/second_user_register_page.dart';
+import 'package:rebridge/pages/bookmark_page.dart';
 import '../../pages/login_page.dart';
 import '../../pages/splash_page.dart';
 import '../../pages/home_page.dart';
@@ -61,7 +62,10 @@ final appRouterProvider = Provider<GoRouter>((ref) {
           builder: (context, state) => const SafetyMaterialPage()),
       GoRoute(
           path: '/companylists',
-          builder: (context, state) => const CompanyListPage())
+          builder: (context, state) => const CompanyListPage()),
+      GoRoute(
+          path: '/bookmarks',
+          builder: (context, state) => const BookmarkPage()),
     ],
   );
 });

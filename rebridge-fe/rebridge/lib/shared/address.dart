@@ -1,3 +1,3 @@
 class Address {
-  static const String baseUrl = 'http://192.168.248.45:8080';
+  static const String baseUrl = 'http://172.20.144.182:8080';
 }

@@ -3,6 +3,7 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:rebridge/shared/styles/button_style.dart';
 import 'package:rebridge/shared/styles/device_styles.dart';
 import 'package:rebridge/shared/utils/skeletonLine.dart';
+import 'package:url_launcher/url_launcher_string.dart';
 
 class CompanyCard extends StatefulWidget {
   final Map<String, String> company;
@@ -149,11 +150,19 @@ class _CompanyCardState extends State<CompanyCard> {
             children: [
               ElevatedButton.icon(
                 onPressed: () async {
-                  final url = company['url'];
-                  if (url != null && url.isNotEmpty) {
-                    final uri = Uri.tryParse(url);
-                    if (uri != null && await canLaunchUrl(uri)) {
-                      await launchUrl(uri);
+                  final rawUrl = company['url'];
+                  if (rawUrl != null && rawUrl.isNotEmpty) {
+                    final cleanedUrl = rawUrl.replaceAll('&amp;', '&');
+                    final fullUrl = cleanedUrl.startsWith('http')
+                        ? cleanedUrl
+                        : 'https://$cleanedUrl';
+                    final uri = Uri.parse(fullUrl);
+
+                    print('[URL 버튼 클릭] Cleaned URI: $uri');
+
+                    if (await canLaunchUrl(uri)) {
+                      await launchUrl(uri,
+                          mode: LaunchMode.externalApplication);
                     } else {
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(content: Text('Cannot launch URL')),

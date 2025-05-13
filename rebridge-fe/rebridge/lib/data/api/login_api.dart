@@ -117,6 +117,8 @@ class LoginApi {
         final role = responseData['role'];
         final name = responseData['name'] ?? '';
         final email = responseData['email'] ?? '';
+        final accessToken = responseData['accessToken'];
+        final refreshToken = responseData['refreshToken'];
 
         print('[GoogleLogin] ✅ 응답 데이터: $responseData');
 
@@ -152,10 +154,18 @@ class LoginApi {
             context,
             title: 'Welcome!',
             content: 'Welcome!',
-            onConfirm: () {
+            onConfirm: () async {
               Navigator.of(context).pop();
-              // ref.read(authProvider.notifier).login();
-              context.push('/home');
+
+              print('[GoogleLogin] accessToken: $accessToken');
+              print('[GoogleLogin] refreshToken: $refreshToken');
+
+              await ref.read(authProvider.notifier).login(
+                    accessToken: accessToken,
+                    refreshToken: refreshToken,
+                  );
+
+              context.go('/home');
             },
           );
         } else {

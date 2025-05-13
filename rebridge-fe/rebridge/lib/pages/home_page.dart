@@ -54,6 +54,7 @@ class _HomePageState extends ConsumerState<HomePage> with RouteAware {
       final jobPostings = await JobPostingApi.fetchRandomJob();
       List<Map<String, String>> converted = jobPostings.map((job) {
         return {
+          'id': job.id.toString(),
           'name': job.companyName,
           'field': job.field,
           'country': job.nation,
@@ -329,7 +330,9 @@ class _HomePageState extends ConsumerState<HomePage> with RouteAware {
           SizedBox(
             width: double.infinity,
             child: ElevatedButton.icon(
-              onPressed: () {},
+              onPressed: () {
+                context.push('/bookmarks');
+              },
               icon: const Icon(Icons.bookmark_border),
               label: const Text('Bookmark Post'),
               style: ElevatedButton.styleFrom(

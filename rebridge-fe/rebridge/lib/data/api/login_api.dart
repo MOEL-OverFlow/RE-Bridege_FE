@@ -54,12 +54,15 @@ class LoginApi {
         final accessToken = responseData['accessToken'];
         final refreshToken = responseData['refreshToken'];
 
+        print(
+            '[LoginApi] Received tokens - Access: $accessToken, Refresh: $refreshToken');
+
         await ref.read(authProvider.notifier).login(
               accessToken: accessToken,
               refreshToken: refreshToken,
             );
 
-        print('[LoginApi] 로그인 성공: $id');
+        print('[LoginApi] Login successful: $id');
         print('$accessToken');
         if (!context.mounted) return;
 

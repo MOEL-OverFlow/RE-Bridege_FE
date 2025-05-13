@@ -63,6 +63,29 @@ class _FinalUserRegisterPageState extends ConsumerState<FinalUserRegisterPage> {
     'TRANSPORT',
     'NONE'
   ];
+  Future<void> _uploadSelectedImage() async {
+    if (selectedImage == null) return;
+
+    final imageUrl = await RegisterApi.uploadImage(selectedImage!);
+    if (imageUrl != null) {
+      final current = ref.read(userRegisterProvider);
+      if (current != null) {
+        ref.read(userRegisterProvider.notifier).state =
+            current.copyWith(imagePath: imageUrl);
+      }
+      DialogUtil.showCustomDialog(
+        context,
+        title: 'Image Uploaded',
+        content: 'Profile image successfully uploaded.',
+      );
+    } else {
+      DialogUtil.showCustomDialog(
+        context,
+        title: 'Upload Failed',
+        content: 'Failed to upload the image. Please try again.',
+      );
+    }
+  }
 
   Future<void> _pickImage() async {
     final pickedFile =
@@ -72,7 +95,7 @@ class _FinalUserRegisterPageState extends ConsumerState<FinalUserRegisterPage> {
       setState(() {
         selectedImage = File(pickedFile.path);
       });
-
+      await _uploadSelectedImage();
       final current = ref.read(userRegisterProvider);
       if (current != null) {
         ref.read(userRegisterProvider.notifier).state = current.copyWith(

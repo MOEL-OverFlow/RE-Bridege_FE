@@ -66,13 +66,13 @@ class _FinalUserRegisterPageState extends ConsumerState<FinalUserRegisterPage> {
   Future<void> _uploadSelectedImage() async {
     if (selectedImage == null) return;
 
-    final imageUrl = await RegisterApi.uploadImage(selectedImage!);
+    final imageUrl = await RegisterApi.uploadImage(selectedImage!, context);
     if (imageUrl != null) {
-      final current = ref.read(userRegisterProvider);
-      if (current != null) {
-        ref.read(userRegisterProvider.notifier).state =
-            current.copyWith(imagePath: imageUrl);
-      }
+      // final current = ref.read(userRegisterProvider);
+      // if (current != null) {
+      //   ref.read(userRegisterProvider.notifier).state =
+      //       current.copyWith(imagePath: imageUrl);
+      // }
       DialogUtil.showCustomDialog(
         context,
         title: 'Image Uploaded',

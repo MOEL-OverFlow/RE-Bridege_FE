@@ -1,6 +1,9 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:rebridge/shared/styles/background_styles.dart';
 import 'package:rebridge/shared/styles/button_style.dart';
 import 'package:rebridge/shared/styles/device_styles.dart';
@@ -91,7 +94,30 @@ class MyPage extends ConsumerWidget {
                             Column(
                               children: [
                                 GestureDetector(
-                                  onTap: () {},
+                                  onTap: () async {
+                                    final picker = ImagePicker();
+                                    final pickedFile = await picker.pickImage(
+                                        source: ImageSource.gallery);
+                                    if (pickedFile == null) return;
+
+                                    final imageFile = File(pickedFile.path);
+                                    final success =
+                                        await UserApi.uploadAndSaveProfileImage(
+                                            imageFile, context);
+                                    print('Success : $success');
+
+                                    if (success != '') {
+                                      final current =
+                                          ref.read(userRegisterProvider);
+                                      if (current != null) {
+                                        ref
+                                                .read(userRegisterProvider.notifier)
+                                                .state =
+                                            current.copyWith(
+                                                imagePath: success);
+                                      }
+                                    }
+                                  },
                                   child: Container(
                                     decoration: BoxDecoration(
                                       color: const Color(0xFFA5B4FC),

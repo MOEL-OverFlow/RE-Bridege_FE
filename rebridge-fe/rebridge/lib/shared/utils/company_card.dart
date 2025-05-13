@@ -4,7 +4,6 @@ import 'package:rebridge/shared/styles/button_style.dart';
 import 'package:rebridge/shared/styles/device_styles.dart';
 import 'package:rebridge/shared/utils/skeletonLine.dart';
 import 'package:rebridge/data/api/Bookmark_api.dart';
-import 'package:rebridge/data/api/JobPosting_api.dart';
 
 class CompanyCard extends StatefulWidget {
   final Map<String, String> company;

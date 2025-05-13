@@ -133,4 +133,43 @@ class JobPostingApi {
           'Failed to load recommended job postings: ${response.body}');
     }
   }
+
+  static Future<List<JobPosting>> fetchFilteredJobs({
+    String? field,
+    String? jobType,
+    String? industryType,
+    String? nation,
+    String? experience,
+    String? koreanSkillLevel,
+  }) async {
+    final prefs = await SharedPreferences.getInstance();
+    final accessToken = prefs.getString('accessToken');
+
+    if (accessToken == null) {
+      throw Exception('Access token not found. Please log in again.');
+    }
+
+    final response = await http.post(
+      Uri.parse('${Address.baseUrl}/job-postings/filtering'),
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $accessToken',
+      },
+      body: jsonEncode({
+        'field': field,
+        'jobType': jobType,
+        'industryType': industryType,
+        'nation': nation,
+        'experience': experience,
+        'koreanSkillLevel': koreanSkillLevel,
+      }),
+    );
+
+    if (response.statusCode == 200) {
+      final List<dynamic> data = jsonDecode(response.body);
+      return data.map((e) => JobPosting.fromJson(e)).toList();
+    } else {
+      throw Exception('Failed to filter job postings: ${response.body}');
+    }
+  }
 }

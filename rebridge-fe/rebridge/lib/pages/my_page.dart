@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:rebridge/shared/styles/background_styles.dart';
+import 'package:rebridge/shared/styles/button_style.dart';
 import 'package:rebridge/shared/styles/device_styles.dart';
 import 'package:rebridge/shared/providers/auth_provider.dart';
 import 'package:rebridge/shared/providers/user_register_provider.dart';
@@ -10,6 +11,45 @@ import 'package:rebridge/data/api/user_api.dart';
 
 class MyPage extends ConsumerWidget {
   const MyPage({super.key});
+
+  static const List<String> nationOptions = [
+    'BANGLADESH',
+    'CAMBODIA',
+    'CHINA',
+    'INDONESIA',
+    'KYRGYZ',
+    'LAOS',
+    'MONGOLIA',
+    'MYANMAR',
+    'NEPAL',
+    'PAKISTAN',
+    'PHILIPPINES',
+    'SRI_LANKA',
+    'THAILAND',
+    'TIMOR_LESTE',
+    'UZBEKISTAN',
+    'VIETNAM',
+    'SOUTH_KOREA',
+    'OTHER'
+  ];
+
+  static const List<String> fieldOptions = [
+    'CONSTRUCTION',
+    'METAL',
+    'MACHINE',
+    'ELECTRICITY',
+    'ELECTRONIC',
+    'TELECOMMUNICATIONS',
+    'TEXTILE',
+    'CHEMICALS',
+    'FOOD',
+    'AGRICULTURE',
+    'STOCKBREEDING',
+    'FISHERY',
+    'WOODWORK',
+    'TRANSPORT',
+    'NONE'
+  ];
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -20,11 +60,12 @@ class MyPage extends ConsumerWidget {
       body: SafeArea(
         child: Column(
           children: [
+            SizedBox(height: DeviceStyles.screenHeight(context) * 0.01),
             SizedBox(
               width: double.infinity,
               child: Center(
                 child: Text(
-                  '회원 정보',
+                  'User Info',
                   style: TextStyle(
                     color: Colors.black,
                     fontSize: DeviceStyles.screenWidth(context) * 0.06,
@@ -36,8 +77,10 @@ class MyPage extends ConsumerWidget {
             Expanded(
               child: SingleChildScrollView(
                 child: Padding(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+                  padding: EdgeInsets.symmetric(
+                    horizontal: DeviceStyles.screenWidth(context) * 0.06,
+                    vertical: DeviceStyles.screenHeight(context) * 0.01,
+                  ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -48,59 +91,79 @@ class MyPage extends ConsumerWidget {
                             Column(
                               children: [
                                 GestureDetector(
-                                  onTap: () {
-                                    // TODO: 이미지 수정 기능
-                                  },
+                                  onTap: () {},
                                   child: Container(
                                     decoration: BoxDecoration(
                                       color: const Color(0xFFA5B4FC),
-                                      borderRadius: BorderRadius.circular(20),
+                                      borderRadius: BorderRadius.circular(
+                                          DeviceStyles.screenWidth(context) *
+                                              0.04),
                                     ),
-                                    padding: const EdgeInsets.all(8),
+                                    padding: EdgeInsets.all(
+                                        DeviceStyles.screenWidth(context) *
+                                            0.02),
                                     child: Container(
-                                      width: 100,
-                                      height: 100,
+                                      width: DeviceStyles.screenWidth(context) *
+                                          0.24,
+                                      height:
+                                          DeviceStyles.screenHeight(context) *
+                                              0.15,
                                       decoration: BoxDecoration(
                                         color: Colors.white,
-                                        borderRadius: BorderRadius.circular(16),
+                                        borderRadius: BorderRadius.circular(
+                                            ButtonStyles.borderradius(context)),
                                       ),
                                       child: user?.imagePath != null &&
                                               user!.imagePath.isNotEmpty
                                           ? ClipRRect(
                                               borderRadius:
-                                                  BorderRadius.circular(16),
+                                                  BorderRadius.circular(
+                                                      ButtonStyles.borderradius(
+                                                          context)),
                                               child: Image.network(
-                                                user.imagePath,
-                                                fit: BoxFit.cover,
-                                              ),
+                                                  user.imagePath,
+                                                  fit: BoxFit.cover),
                                             )
-                                          : const Icon(Icons.image,
-                                              size: 50, color: Colors.black),
+                                          : Icon(Icons.image,
+                                              size: DeviceStyles.screenWidth(
+                                                      context) *
+                                                  0.12,
+                                              color: Colors.black),
                                     ),
                                   ),
                                 ),
-                                const SizedBox(height: 8),
-                                const Text(
-                                  '이미지를 클릭하면 이미지를\n수정할 수 있습니다',
+                                SizedBox(
+                                    height: DeviceStyles.screenHeight(context) *
+                                        0.01),
+                                Text(
+                                  'Click on the image \nto edit the image',
                                   textAlign: TextAlign.center,
-                                  style: TextStyle(fontSize: 12),
+                                  style: TextStyle(
+                                      fontSize:
+                                          DeviceStyles.screenWidth(context) *
+                                              0.025),
                                 ),
                               ],
                             ),
-                            const SizedBox(width: 24),
+                            SizedBox(
+                                width:
+                                    DeviceStyles.screenWidth(context) * 0.15),
                             Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                const Text(
-                                  '현재 이메일',
-                                  style: TextStyle(fontWeight: FontWeight.w600),
-                                ),
-                                const SizedBox(height: 4),
+                                const Text('Email',
+                                    style:
+                                        TextStyle(fontWeight: FontWeight.w600)),
+                                SizedBox(
+                                    height: DeviceStyles.screenHeight(context) *
+                                        0.01),
                                 Text(
-                                  user?.email ?? '이메일 없음',
-                                  style: const TextStyle(
+                                  user?.email ?? 'No Email',
+                                  style: TextStyle(
                                     decoration: TextDecoration.underline,
-                                    fontSize: 13,
+                                    fontSize:
+                                        DeviceStyles.screenWidth(context) *
+                                            0.03,
                                   ),
                                 ),
                               ],
@@ -108,22 +171,24 @@ class MyPage extends ConsumerWidget {
                           ],
                         ),
                       ),
-                      const SizedBox(height: 16),
+                      SizedBox(
+                          height: DeviceStyles.screenHeight(context) * 0.01),
                       _buildEditableTile(
-                          context, ref, '이름', user?.fullName ?? '',
+                          context, ref, 'Name', user?.fullName ?? '',
                           field: 'fullName'),
                       _buildEditableTile(
-                          context, ref, '생년월일', user?.birth ?? '',
+                          context, ref, 'Birth', user?.birth ?? '',
                           field: 'birth'),
                       _buildEditableTile(
-                          context, ref, '국가', user?.nationality ?? '',
+                          context, ref, 'Nation', user?.nationality ?? '',
                           field: 'nationality'),
-                      _buildEditableTile(context, ref, '관심업종',
+                      _buildEditableTile(context, ref, 'Industry of interest',
                           '${user?.primaryIndustry ?? ''} / ${user?.secondaryIndustry ?? ''}',
                           field: 'industry'),
-                      _buildEditableTile(context, ref, '비밀번호 변경', '',
+                      _buildEditableTile(context, ref, 'Change Password', '',
                           field: 'password'),
-                      const SizedBox(height: 16),
+                      SizedBox(
+                          height: DeviceStyles.screenHeight(context) * 0.01),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         children: [
@@ -132,15 +197,15 @@ class MyPage extends ConsumerWidget {
                               final result =
                                   await DialogCancelUtil.showCancelCustomDialog(
                                 context,
-                                title: '로그아웃',
-                                content: '정말 로그아웃 하시겠습니까?',
+                                title: 'Logout',
+                                content: 'Are you sure you want to log out?',
                               );
                               if (result) {
                                 await ref.read(authProvider.notifier).logout();
                                 if (context.mounted) context.go('/login');
                               }
                             },
-                            child: const Text('로그아웃',
+                            child: const Text('Log Out',
                                 style: TextStyle(color: Colors.black54)),
                           ),
                           const Text('|'),
@@ -149,11 +214,12 @@ class MyPage extends ConsumerWidget {
                               final result =
                                   await DialogCancelUtil.showCancelCustomDialog(
                                 context,
-                                title: '회원탈퇴',
-                                content: '정말 탈퇴하시겠습니까?',
+                                title: 'Withdraw Membership',
+                                content: 'Are you sure you want to withdraw?',
                               );
                               if (result) {
-                                final success = await UserApi.deactivateUser();
+                                final success =
+                                    await UserApi.deactivateUser(context);
                                 if (success && context.mounted) {
                                   await ref
                                       .read(authProvider.notifier)
@@ -162,7 +228,7 @@ class MyPage extends ConsumerWidget {
                                 }
                               }
                             },
-                            child: const Text('회원탈퇴',
+                            child: const Text('Withdraw\nMembership',
                                 style: TextStyle(color: Colors.black54)),
                           ),
                         ],
@@ -179,8 +245,12 @@ class MyPage extends ConsumerWidget {
   }
 
   Widget _buildEditableTile(
-      BuildContext context, WidgetRef ref, String title, String value,
-      {required String field}) {
+    BuildContext context,
+    WidgetRef ref,
+    String title,
+    String value, {
+    required String field,
+  }) {
     return _buildInfoTile(
       context,
       title,
@@ -189,141 +259,195 @@ class MyPage extends ConsumerWidget {
         final current = ref.read(userRegisterProvider);
         if (current == null) return;
 
+        Future<void> showStyledDialog(
+            Widget content, VoidCallback onSave) async {
+          await showDialog(
+            context: context,
+            builder: (context) => AlertDialog(
+              backgroundColor: const Color(0xFFe9eeff),
+              title: Center(
+                child: Text(
+                  '$title Edit',
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: DeviceStyles.screenWidth(context) * 0.045,
+                  ),
+                ),
+              ),
+              content: content,
+              actions: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    SizedBox(
+                      width: DeviceStyles.screenWidth(context) * 0.25,
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.white,
+                        ),
+                        onPressed: () => Navigator.pop(context),
+                        child: const Text('Cancel',
+                            style: TextStyle(color: Color(0xFF4C68FF))),
+                      ),
+                    ),
+                    SizedBox(width: DeviceStyles.screenWidth(context) * 0.03),
+                    SizedBox(
+                      width: DeviceStyles.screenWidth(context) * 0.25,
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFF4C68FF),
+                        ),
+                        onPressed: () {
+                          Navigator.pop(context);
+                          onSave();
+                        },
+                        child: const Text(
+                          'Save',
+                          style: TextStyle(color: Colors.white),
+                        ),
+                      ),
+                    ),
+                  ],
+                )
+              ],
+            ),
+          );
+        }
+
         if (field == 'birth') {
           final selected = await showDatePicker(
             context: context,
             initialDate: DateTime.tryParse(current.birth) ?? DateTime.now(),
             firstDate: DateTime(1900),
             lastDate: DateTime.now(),
+            builder: (context, child) => Theme(
+              data: ThemeData.light().copyWith(
+                colorScheme:
+                    const ColorScheme.light(primary: Color(0xFF4C68FF)),
+              ),
+              child: child!,
+            ),
           );
           if (selected != null) {
             final formatted = selected.toIso8601String().split('T').first;
-            final success = await UserApi.updateBirthDate(formatted);
+            final success = await UserApi.updateBirthDate(formatted, context);
             if (success) {
               ref.read(userRegisterProvider.notifier).state =
                   current.copyWith(birth: formatted);
             }
           }
         } else if (field == 'industry') {
-          final primaryController =
-              TextEditingController(text: current.primaryIndustry);
-          final secondaryController =
-              TextEditingController(text: current.secondaryIndustry);
+          String? primary = current.primaryIndustry;
+          String? secondary = current.secondaryIndustry;
 
-          final result = await showDialog<bool>(
-            context: context,
-            builder: (context) => AlertDialog(
-              title: const Text('관심업종 수정'),
-              content: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  TextField(
-                    controller: primaryController,
-                    decoration: const InputDecoration(labelText: '관심업종 1'),
-                  ),
-                  const SizedBox(height: 8),
-                  TextField(
-                    controller: secondaryController,
-                    decoration: const InputDecoration(labelText: '관심업종 2'),
-                  ),
-                ],
-              ),
-              actions: [
-                TextButton(
-                  onPressed: () => Navigator.pop(context, false),
-                  child: const Text('취소'),
+          await showStyledDialog(
+            Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                DropdownButtonFormField<String>(
+                  value: primary,
+                  decoration:
+                      const InputDecoration(labelText: 'Primary Industry'),
+                  items: MyPage.fieldOptions
+                      .map((opt) =>
+                          DropdownMenuItem(value: opt, child: Text(opt)))
+                      .toList(),
+                  onChanged: (val) => primary = val,
                 ),
-                ElevatedButton(
-                  onPressed: () => Navigator.pop(context, true),
-                  child: const Text('저장'),
+                SizedBox(height: DeviceStyles.screenHeight(context) * 0.01),
+                DropdownButtonFormField<String>(
+                  value: secondary,
+                  decoration:
+                      const InputDecoration(labelText: 'Secondary Industry'),
+                  items: MyPage.fieldOptions
+                      .map((opt) =>
+                          DropdownMenuItem(value: opt, child: Text(opt)))
+                      .toList(),
+                  onChanged: (val) => secondary = val,
                 ),
               ],
             ),
+            () async {
+              if (primary != null && secondary != null) {
+                final success =
+                    await UserApi.updateFields(primary!, secondary!, context);
+                if (success) {
+                  ref.read(userRegisterProvider.notifier).state =
+                      current.copyWith(
+                    primaryIndustry: primary,
+                    secondaryIndustry: secondary,
+                  );
+                }
+              }
+            },
           );
+        } else if (field == 'nationality') {
+          String? selected = current.nationality;
 
-          if (result == true) {
-            final success = await UserApi.updateFields(
-              primaryController.text.trim(),
-              secondaryController.text.trim(),
-            );
-            if (success) {
-              ref.read(userRegisterProvider.notifier).state = current.copyWith(
-                primaryIndustry: primaryController.text.trim(),
-                secondaryIndustry: secondaryController.text.trim(),
-              );
-            }
-          }
+          await showStyledDialog(
+            DropdownButtonFormField<String>(
+              value: selected,
+              isExpanded: true,
+              decoration: const InputDecoration(labelText: 'Choose Nation'),
+              items: MyPage.nationOptions
+                  .map((opt) => DropdownMenuItem(value: opt, child: Text(opt)))
+                  .toList(),
+              onChanged: (val) => selected = val,
+            ),
+            () async {
+              if (selected != null) {
+                final success = await UserApi.updateNation(selected!, context);
+                if (success) {
+                  ref.read(userRegisterProvider.notifier).state =
+                      current.copyWith(nationality: selected);
+                }
+              }
+            },
+          );
         } else if (field == 'password') {
           final controller = TextEditingController();
-          final result = await showDialog<String>(
-            context: context,
-            builder: (context) => AlertDialog(
-              title: const Text('새 비밀번호 입력'),
-              content: TextField(
-                controller: controller,
-                obscureText: true,
-                decoration: const InputDecoration(hintText: '새 비밀번호'),
-              ),
-              actions: [
-                TextButton(
-                  onPressed: () => Navigator.pop(context),
-                  child: const Text('취소'),
-                ),
-                ElevatedButton(
-                  onPressed: () =>
-                      Navigator.pop(context, controller.text.trim()),
-                  child: const Text('저장'),
-                ),
-              ],
-            ),
-          );
 
-          if (result != null && result.isNotEmpty) {
-            final success = await UserApi.updatePassword(result);
-            if (success) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('비밀번호가 변경되었습니다.')),
-              );
-            }
-          }
+          await showStyledDialog(
+            TextField(
+              controller: controller,
+              obscureText: true,
+              decoration: const InputDecoration(
+                labelText: 'New Password',
+                border: OutlineInputBorder(),
+              ),
+            ),
+            () async {
+              final result = controller.text.trim();
+              if (result.isNotEmpty) {
+                await UserApi.updatePassword(result, context);
+              }
+            },
+          );
         } else {
           final controller = TextEditingController(text: value);
-          final result = await showDialog<String>(
-            context: context,
-            builder: (context) => AlertDialog(
-              title: Text('$title 수정'),
-              content: TextField(
-                controller: controller,
-                decoration: const InputDecoration(border: OutlineInputBorder()),
-              ),
-              actions: [
-                TextButton(
-                  onPressed: () => Navigator.pop(context),
-                  child: const Text('취소'),
-                ),
-                ElevatedButton(
-                  onPressed: () =>
-                      Navigator.pop(context, controller.text.trim()),
-                  child: const Text('저장'),
-                ),
-              ],
-            ),
-          );
 
-          if (result != null) {
-            bool success = false;
-            if (field == 'fullName') {
-              success = await UserApi.updateName(result, context);
-              if (success)
-                ref.read(userRegisterProvider.notifier).state =
-                    current.copyWith(fullName: result);
-            } else if (field == 'nationality') {
-              success = await UserApi.updateNation(result);
-              if (success)
-                ref.read(userRegisterProvider.notifier).state =
-                    current.copyWith(nationality: result);
-            }
-          }
+          await showStyledDialog(
+            TextField(
+              controller: controller,
+              decoration: const InputDecoration(
+                labelText: 'Input Value',
+                border: OutlineInputBorder(),
+              ),
+            ),
+            () async {
+              final result = controller.text.trim();
+              if (result.isNotEmpty) {
+                bool success = false;
+                if (field == 'fullName') {
+                  success = await UserApi.updateName(result, context);
+                  if (success) {
+                    ref.read(userRegisterProvider.notifier).state =
+                        current.copyWith(fullName: result);
+                  }
+                }
+              }
+            },
+          );
         }
       },
     );
@@ -335,7 +459,9 @@ class MyPage extends ConsumerWidget {
       children: [
         ListTile(
           contentPadding: EdgeInsets.zero,
-          title: Text(title, style: const TextStyle(fontSize: 14)),
+          title: Text(title,
+              style: TextStyle(
+                  fontSize: DeviceStyles.screenWidth(context) * 0.03)),
           trailing: Row(
             mainAxisSize: MainAxisSize.min,
             children: [

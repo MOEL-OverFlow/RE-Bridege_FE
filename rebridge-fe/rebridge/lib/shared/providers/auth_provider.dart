@@ -18,6 +18,14 @@ class AuthNotifier extends StateNotifier<bool> {
     final prefs = await SharedPreferences.getInstance();
     final saved = prefs.getBool('isLoggedIn') ?? false;
     state = saved;
+    final user = await UserApi.getUserInfo();
+    if (user != null) {
+      ref.read(userRegisterProvider.notifier).state = user;
+      print('[AuthNotifier] 사용자 정보 로딩 완료');
+    } else {
+      ref.read(userRegisterProvider.notifier).state = null;
+      print('[AuthNotifier] 사용자 정보 로딩 실패');
+    }
     print('[AuthNotifier] 초기 로그인 상태: $state');
   }
 

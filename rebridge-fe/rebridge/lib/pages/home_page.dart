@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:rebridge/data/api/JobPosting_api.dart';
+import 'package:rebridge/main.dart';
 import 'package:rebridge/shared/providers/user_register_provider.dart';
 import 'package:rebridge/shared/styles/background_styles.dart';
 import 'package:rebridge/shared/styles/button_style.dart';
@@ -17,7 +18,7 @@ class HomePage extends ConsumerStatefulWidget {
   ConsumerState<HomePage> createState() => _HomePageState();
 }
 
-class _HomePageState extends ConsumerState<HomePage> {
+class _HomePageState extends ConsumerState<HomePage> with RouteAware {
   final PageController _pageController = PageController(viewportFraction: 0.85);
   int _currentPage = 0;
   bool isLoading = false;
@@ -26,6 +27,27 @@ class _HomePageState extends ConsumerState<HomePage> {
   @override
   void initState() {
     super.initState();
+    _loadJobPostings();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+
+    /// ✅ RouteObserver에 구독
+    routeObserver.subscribe(this, ModalRoute.of(context)!);
+  }
+
+  @override
+  void dispose() {
+    routeObserver.unsubscribe(this);
+    _pageController.dispose();
+    super.dispose();
+  }
+
+  /// ✅ 다른 페이지에서 pop하고 돌아왔을 때 실행됨
+  @override
+  void didPopNext() {
     _loadJobPostings();
   }
 
@@ -57,12 +79,6 @@ class _HomePageState extends ConsumerState<HomePage> {
     } catch (e) {
       debugPrint('Failed to load job postings: $e');
     }
-  }
-
-  @override
-  void dispose() {
-    _pageController.dispose();
-    super.dispose();
   }
 
   @override

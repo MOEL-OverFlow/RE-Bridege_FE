@@ -109,24 +109,41 @@ class _CompanyListPageState extends State<CompanyListPage> {
   Future<void> _fetchJobPostings() async {
     final postings = await JobPostingApi.fetchJobPostings();
     setState(() {
-      companyList = postings
-          .map((e) => {
-                'name': e.companyName,
-                'field': e.field,
-                'jobType': e.jobType,
-                'url': e.detailUrl,
-                'industryType': e.industryType,
-                'country': e.nation,
-                'recruit': e.recruitmentCount.toString(),
-                'experience': e.experience,
-                'koreanSkill': e.koreanSkillLevel,
-                'deadline': e.deadline,
-                'bookMark': e.isBookmark.toString(),
-              })
-          .toList();
+      companyList = postings.map((e) => _mapPosting(e)).toList();
       isLoading = false;
     });
   }
+
+  Future<void> _filterJobPostings() async {
+    setState(() => isLoading = true);
+    final filtered = await JobPostingApi.fetchFilteredJobs(
+      field: selectedField,
+      jobType: selectedJobType,
+      industryType: selectedIndustryType,
+      nation: selectedCountry,
+      experience: selectedExperience,
+      koreanSkillLevel: selectedKoreanSkill,
+    );
+    setState(() {
+      companyList = filtered.map((e) => _mapPosting(e)).toList();
+      currentPage = 1;
+      isLoading = false;
+    });
+  }
+
+  Map<String, String> _mapPosting(JobPosting e) => {
+        'name': e.companyName,
+        'field': e.field,
+        'jobType': e.jobType,
+        'url': e.detailUrl,
+        'industryType': e.industryType,
+        'country': e.nation,
+        'recruit': e.recruitmentCount.toString(),
+        'experience': e.experience,
+        'koreanSkill': e.koreanSkillLevel,
+        'deadline': e.deadline,
+        'bookMark': e.isBookmark.toString(),
+      };
 
   @override
   Widget build(BuildContext context) {
@@ -157,7 +174,6 @@ class _CompanyListPageState extends State<CompanyListPage> {
               ),
               const SizedBox(height: 16),
               _buildFilterButton(context),
-              _buildFilterSection(),
               const SizedBox(height: 16),
               Expanded(
                 child: isLoading
@@ -193,7 +209,90 @@ class _CompanyListPageState extends State<CompanyListPage> {
       width: double.infinity,
       child: ElevatedButton(
         onPressed: () {
-          setState(() => showFilters = !showFilters);
+          showModalBottomSheet(
+            context: context,
+            isScrollControlled: true,
+            backgroundColor: Colors.white,
+            shape: const RoundedRectangleBorder(
+              borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+            ),
+            builder: (_) => Padding(
+              padding: MediaQuery.of(context).viewInsets,
+              child: StatefulBuilder(
+                builder: (context, setModalState) {
+                  return Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Text(
+                          'Filter Options',
+                          style: TextStyle(
+                              fontSize: 18, fontWeight: FontWeight.bold),
+                        ),
+                        const SizedBox(height: 16),
+                        _buildDropdown(
+                            'Country',
+                            selectedCountry,
+                            countryOptions,
+                            (val) =>
+                                setModalState(() => selectedCountry = val)),
+                        const SizedBox(height: 12),
+                        _buildDropdown('Field', selectedField, fieldOptions,
+                            (val) => setModalState(() => selectedField = val)),
+                        const SizedBox(height: 12),
+                        _buildDropdown(
+                            'Job Type',
+                            selectedJobType,
+                            jobTypeOptions,
+                            (val) =>
+                                setModalState(() => selectedJobType = val)),
+                        const SizedBox(height: 12),
+                        _buildDropdown(
+                            'Industry Type',
+                            selectedIndustryType,
+                            industryTypeOptions,
+                            (val) => setModalState(
+                                () => selectedIndustryType = val)),
+                        const SizedBox(height: 12),
+                        _buildDropdown(
+                            'Experience',
+                            selectedExperience,
+                            experienceOptions,
+                            (val) =>
+                                setModalState(() => selectedExperience = val)),
+                        const SizedBox(height: 12),
+                        _buildDropdown(
+                            'Korean Skill',
+                            selectedKoreanSkill,
+                            koreanSkillOptions,
+                            (val) =>
+                                setModalState(() => selectedKoreanSkill = val)),
+                        const SizedBox(height: 20),
+                        SizedBox(
+                          width: double.infinity,
+                          child: ElevatedButton(
+                            onPressed: () async {
+                              Navigator.of(context).pop(); // 닫고 필터링 실행
+                              await _filterJobPostings();
+                            },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: const Color(0xFF4AD0C7),
+                              padding: const EdgeInsets.symmetric(vertical: 12),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                            ),
+                            child: const Text('Apply Filter'),
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+                },
+              ),
+            ),
+          );
         },
         style: ElevatedButton.styleFrom(
           backgroundColor: ButtonStyles.buttonColor,
@@ -213,82 +312,10 @@ class _CompanyListPageState extends State<CompanyListPage> {
     );
   }
 
-  Widget _buildFilterSection() {
-    return AnimatedSize(
-      duration: const Duration(milliseconds: 300),
-      curve: Curves.easeInOut,
-      alignment: Alignment.topCenter,
-      child: ClipRect(
-        child: showFilters
-            ? Column(
-                children: [
-                  const SizedBox(height: 12),
-                  Wrap(
-                    spacing: 10,
-                    runSpacing: 10,
-                    children: [
-                      _buildDropdown('Country', selectedCountry, countryOptions,
-                          (val) => setState(() => selectedCountry = val)),
-                      _buildDropdown('Field', selectedField, fieldOptions,
-                          (val) => setState(() => selectedField = val)),
-                      _buildDropdown(
-                          'Job Type',
-                          selectedJobType,
-                          jobTypeOptions,
-                          (val) => setState(() => selectedJobType = val)),
-                      _buildDropdown(
-                          'Industry Type',
-                          selectedIndustryType,
-                          industryTypeOptions,
-                          (val) => setState(() => selectedIndustryType = val)),
-                      _buildDropdown(
-                          'Experience',
-                          selectedExperience,
-                          experienceOptions,
-                          (val) => setState(() => selectedExperience = val)),
-                      _buildDropdown(
-                          'Korean Skill',
-                          selectedKoreanSkill,
-                          koreanSkillOptions,
-                          (val) => setState(() => selectedKoreanSkill = val)),
-                    ],
-                  ),
-                  const SizedBox(height: 10),
-                  SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton(
-                      onPressed: () {
-                        print('Country: $selectedCountry');
-                        print('Field: $selectedField');
-                        print('Job Type: $selectedJobType');
-                        print('Industry Type: $selectedIndustryType');
-                        print('Experience: $selectedExperience');
-                        print('Korean Skill: $selectedKoreanSkill');
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF4AD0C7),
-                        foregroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 24, vertical: 12),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        elevation: 0,
-                      ),
-                      child: const Text('Search'),
-                    ),
-                  ),
-                ],
-              )
-            : const SizedBox.shrink(),
-      ),
-    );
-  }
-
   Widget _buildDropdown(String label, String? selectedValue,
       List<String> options, ValueChanged<String?> onChanged) {
     return SizedBox(
-      width: 160,
+      width: DeviceStyles.screenWidth(context) * 0.8,
       child: DropdownButtonFormField<String>(
         value: selectedValue,
         isExpanded: true,

@@ -53,24 +53,53 @@ class UserApi {
     return response.statusCode == 200;
   }
 
-  static Future<bool> updatePassword(String newPassword) async {
+  static Future<bool> updatePassword(
+      String newPassword, BuildContext context) async {
     final headers = await _getHeaders();
     final response = await http.patch(
       Uri.parse('${Address.baseUrl}/me/password'),
       headers: headers,
       body: jsonEncode({"newPassword": newPassword}),
     );
-    return response.statusCode == 200;
+    if (response.statusCode == 200) {
+      DialogUtil.showCustomDialog(
+        context,
+        title: 'Change completed',
+        content: 'The Password has been successfully modified.',
+      );
+      return true;
+    } else {
+      DialogUtil.showCustomDialog(
+        context,
+        title: 'Error',
+        content: 'Password change failed. Please try again.',
+      );
+      return false;
+    }
   }
 
-  static Future<bool> updateNation(String nation) async {
+  static Future<bool> updateNation(String nation, BuildContext context) async {
     final headers = await _getHeaders();
     final response = await http.patch(
       Uri.parse('${Address.baseUrl}/me/nation'),
       headers: headers,
       body: jsonEncode({"nation": nation}),
     );
-    return response.statusCode == 200;
+    if (response.statusCode == 200) {
+      DialogUtil.showCustomDialog(
+        context,
+        title: 'Change completed',
+        content: 'The Nation has been successfully modified.',
+      );
+      return true;
+    } else {
+      DialogUtil.showCustomDialog(
+        context,
+        title: 'Error',
+        content: 'Nation change failed. Please try again.',
+      );
+      return false;
+    }
   }
 
   static Future<bool> updateName(String name, BuildContext context) async {
@@ -84,46 +113,90 @@ class UserApi {
     if (response.statusCode == 200) {
       DialogUtil.showCustomDialog(
         context,
-        title: '이름 변경 완료',
-        content: '이름이 성공적으로 수정되었습니다.',
+        title: 'Change completed',
+        content: 'The name has been successfully modified.',
       );
       return true;
     } else {
       DialogUtil.showCustomDialog(
         context,
-        title: '오류 발생',
-        content: '이름 변경에 실패했습니다. 다시 시도해주세요.',
+        title: 'Error',
+        content: 'Name change failed. Please try again.',
       );
       return false;
     }
   }
 
-  static Future<bool> updateFields(String field1, String field2) async {
+  static Future<bool> updateFields(
+      String field1, String field2, BuildContext context) async {
     final headers = await _getHeaders();
     final response = await http.patch(
       Uri.parse('${Address.baseUrl}/me/fields'),
       headers: headers,
       body: jsonEncode({"field1": field1, "field2": field2}),
     );
-    return response.statusCode == 200;
+    if (response.statusCode == 200) {
+      DialogUtil.showCustomDialog(
+        context,
+        title: 'Change completed',
+        content: 'Your industry of interest has been successfully changed.',
+      );
+      return true;
+    } else {
+      DialogUtil.showCustomDialog(
+        context,
+        title: 'Error',
+        content: 'Industry of industry change failed. Please try again.',
+      );
+      return false;
+    }
   }
 
-  static Future<bool> updateBirthDate(String birthDate) async {
+  static Future<bool> updateBirthDate(
+      String birthDate, BuildContext context) async {
     final headers = await _getHeaders();
     final response = await http.patch(
       Uri.parse('${Address.baseUrl}/me/birth-date'),
       headers: headers,
       body: jsonEncode({"birthDate": birthDate}),
     );
-    return response.statusCode == 200;
+    if (response.statusCode == 200) {
+      DialogUtil.showCustomDialog(
+        context,
+        title: 'Change completed',
+        content: 'Your birth has been successfully changed.',
+      );
+      return true;
+    } else {
+      DialogUtil.showCustomDialog(
+        context,
+        title: 'Error',
+        content: 'Birth change failed. Please try again.',
+      );
+      return false;
+    }
   }
 
-  static Future<bool> deactivateUser() async {
+  static Future<bool> deactivateUser(BuildContext context) async {
     final headers = await _getHeaders();
     final response = await http.patch(
       Uri.parse('${Address.baseUrl}/me/deactivate'),
       headers: headers,
     );
-    return response.statusCode == 200;
+    if (response.statusCode == 200) {
+      DialogUtil.showCustomDialog(
+        context,
+        title: 'Withdraw completed',
+        content: 'Your membership withdrawal has been completed.',
+      );
+      return true;
+    } else {
+      DialogUtil.showCustomDialog(
+        context,
+        title: 'Error',
+        content: 'Your membership withdrawal failed. Please try again.',
+      );
+      return false;
+    }
   }
 }

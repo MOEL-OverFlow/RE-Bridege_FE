@@ -1,5 +1,5 @@
 import 'dart:convert';
-
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -7,6 +7,9 @@ import 'package:rebridge/shared/address.dart';
 import 'package:rebridge/shared/utils/dialog_util.dart';
 import 'package:rebridge/shared/providers/user_register_provider.dart';
 import 'package:http/http.dart' as http;
+import 'package:mime/mime.dart';
+import 'package:http_parser/http_parser.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class RegisterApi {
   static Future<bool> sendCode(
@@ -130,22 +133,24 @@ class RegisterApi {
       return false;
     }
 
+    String? imageUrl;
+    if (userData.imagePath != null && userData.imagePath!.isNotEmpty) {
+      final imageFile = File(userData.imagePath!);
+      imageUrl = await uploadImage(imageFile);
+      if (imageUrl == null) {
+        if (!context.mounted) return false;
+        DialogUtil.showCustomDialog(
+          context,
+          title: 'Error',
+          content: 'Image upload failed.',
+        );
+        return false;
+      }
+    }
+
     final loginType = userData.password == null || userData.password!.isEmpty
         ? 'GOOGLE'
         : 'LOCAL';
-
-    print('------ 회원가입 최종 데이터 ------');
-    print('Email: ${userData.email}');
-    print('Password: ${userData.password}');
-    print('Full Name: ${userData.fullName}');
-    print('Birth: ${userData.birth}');
-    print('Foreigner Number: ${userData.foreignNumber}');
-    print('Nationality: ${userData.nationality}');
-    print('Primary Industry: ${userData.primaryIndustry}');
-    print('Secondary Industry: ${userData.secondaryIndustry}');
-    print('Image Path: ${userData.imagePath}');
-    print('Login Type: $loginType');
-    print('--------------------------------');
 
     final body = {
       "email": userData.email,
@@ -154,7 +159,7 @@ class RegisterApi {
       "birthDate": userData.birth,
       "foreignerNumber": userData.foreignNumber,
       "nation": userData.nationality,
-      "image": userData.imagePath,
+      "image": imageUrl ?? "", // 업로드 성공 시 URL, 실패 시 빈 문자열
       "industry1": userData.primaryIndustry,
       "industry2": userData.secondaryIndustry,
       "loginType": loginType,
@@ -197,6 +202,36 @@ class RegisterApi {
       );
       print('Signup error: $e');
       return false;
+    }
+  }
+
+  static Future<String?> uploadImage(File imageFile) async {
+    try {
+      final uri = Uri.parse('${Address.baseUrl}/images/upload');
+      final request = http.MultipartRequest('POST', uri);
+
+      final mimeType = lookupMimeType(imageFile.path)?.split('/');
+      request.files.add(await http.MultipartFile.fromPath(
+        'file',
+        imageFile.path,
+        contentType: mimeType != null
+            ? MediaType(mimeType[0], mimeType[1])
+            : MediaType('image', 'jpeg'),
+      ));
+
+      final response = await request.send();
+      final responseBody = await response.stream.bytesToString();
+
+      if (response.statusCode == 200) {
+        final json = jsonDecode(responseBody);
+        return json['imageUrl']; // 서버 응답: { "imageUrl": "http://..." }
+      } else {
+        print('[UploadImage] 실패: ${response.statusCode}, $responseBody');
+        return null;
+      }
+    } catch (e) {
+      print('[UploadImage] 예외: $e');
+      return null;
     }
   }
 }

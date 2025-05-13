@@ -33,8 +33,6 @@ class _HomePageState extends ConsumerState<HomePage> with RouteAware {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-
-    /// ✅ RouteObserver에 구독
     routeObserver.subscribe(this, ModalRoute.of(context)!);
   }
 
@@ -45,7 +43,6 @@ class _HomePageState extends ConsumerState<HomePage> with RouteAware {
     super.dispose();
   }
 
-  /// ✅ 다른 페이지에서 pop하고 돌아왔을 때 실행됨
   @override
   void didPopNext() {
     _loadJobPostings();
@@ -53,8 +50,8 @@ class _HomePageState extends ConsumerState<HomePage> with RouteAware {
 
   Future<void> _loadJobPostings() async {
     try {
+      isLoading = true;
       final jobPostings = await JobPostingApi.fetchRandomJob();
-      // print(jobPostings);
       List<Map<String, String>> converted = jobPostings.map((job) {
         return {
           'name': job.companyName,
@@ -147,8 +144,12 @@ class _HomePageState extends ConsumerState<HomePage> with RouteAware {
                                         },
                                         itemBuilder: (context, index) {
                                           return Padding(
-                                            padding: const EdgeInsets.symmetric(
-                                                horizontal: 6),
+                                            padding: EdgeInsets.symmetric(
+                                              horizontal:
+                                                  DeviceStyles.screenWidth(
+                                                          context) *
+                                                      0.01,
+                                            ),
                                             child: CompanyCard(
                                               company: companySamples[index],
                                               isLoading: false,
@@ -157,7 +158,10 @@ class _HomePageState extends ConsumerState<HomePage> with RouteAware {
                                         },
                                       ),
                                     ),
-                                    const SizedBox(height: 8),
+                                    SizedBox(
+                                        height:
+                                            DeviceStyles.screenHeight(context) *
+                                                0.01),
                                     Row(
                                       mainAxisAlignment:
                                           MainAxisAlignment.center,
@@ -246,9 +250,11 @@ class _HomePageState extends ConsumerState<HomePage> with RouteAware {
                       SizedBox(
                           width: DeviceStyles.screenWidth(context) * 0.005),
                       isLoading
-                          ? const SkeletonLine(width: 80, height: 14)
+                          ? SkeletonLine(
+                              width: DeviceStyles.screenWidth(context) * 0.04,
+                              height: DeviceStyles.screenHeight(context) * 0.01)
                           : Text(
-                              user?.fullName ?? '이름 없음',
+                              user?.fullName ?? 'No Name',
                               style: TextStyle(
                                 fontWeight: FontWeight.bold,
                                 fontSize:
@@ -273,19 +279,31 @@ class _HomePageState extends ConsumerState<HomePage> with RouteAware {
                     ),
                     SizedBox(height: DeviceStyles.screenHeight(context) * 0.01),
                     isLoading
-                        ? const Column(
+                        ? Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              SkeletonLine(width: 80, height: 10),
-                              SizedBox(height: 6),
-                              SkeletonLine(width: 80, height: 10),
+                              SkeletonLine(
+                                  width:
+                                      DeviceStyles.screenWidth(context) * 0.04,
+                                  height: DeviceStyles.screenHeight(context) *
+                                      0.01),
+                              SizedBox(
+                                  height: DeviceStyles.screenHeight(context) *
+                                      0.01),
+                              SkeletonLine(
+                                  width:
+                                      DeviceStyles.screenWidth(context) * 0.04,
+                                  height: DeviceStyles.screenHeight(context) *
+                                      0.01),
                             ],
                           )
                         : Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text('1. ${user?.primaryIndustry ?? '없음'}'),
-                              Text('2. ${user?.secondaryIndustry ?? '없음'}'),
+                              Text(
+                                  '1. ${user?.primaryIndustry ?? 'No Primary Industry'}'),
+                              Text(
+                                  '2. ${user?.secondaryIndustry ?? 'No Secondary Indsutry'}'),
                             ],
                           ),
                   ],
@@ -301,9 +319,9 @@ class _HomePageState extends ConsumerState<HomePage> with RouteAware {
                 : Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text('📧 Email: ${user?.email ?? '없음'}'),
-                      Text('🎂 Birth: ${user?.birth ?? '없음'}'),
-                      Text('🌏 Nation: ${user?.nationality ?? '없음'}'),
+                      Text('📧 Email: ${user?.email ?? 'No Email'}'),
+                      Text('🎂 Birth: ${user?.birth ?? 'No Birth'}'),
+                      Text('🌏 Nation: ${user?.nationality ?? 'No Nation'}'),
                     ],
                   ),
           ),
@@ -318,7 +336,9 @@ class _HomePageState extends ConsumerState<HomePage> with RouteAware {
                 backgroundColor: const Color(0xFFF0F3FF),
                 foregroundColor: Colors.black87,
                 elevation: 0,
-                padding: const EdgeInsets.symmetric(vertical: 12),
+                padding: EdgeInsets.symmetric(
+                    horizontal: ButtonStyles.paddingwidth(context),
+                    vertical: ButtonStyles.paddingheight(context)),
                 shape: RoundedRectangleBorder(
                   borderRadius:
                       BorderRadius.circular(ButtonStyles.borderradius(context)),
@@ -423,11 +443,12 @@ class _HomePageState extends ConsumerState<HomePage> with RouteAware {
   Widget _buildLoadingCards() {
     return PageView.builder(
       itemCount: 3,
-      itemBuilder: (context, index) => const Padding(
-        padding: EdgeInsets.symmetric(horizontal: 6),
-        child: CompanyCard(
-          company: {}, // 빈 값
-          isLoading: true, // 스켈레톤 활성화
+      itemBuilder: (context, index) => Padding(
+        padding: EdgeInsets.symmetric(
+            horizontal: DeviceStyles.screenWidth(context) * 0.02),
+        child: const CompanyCard(
+          company: {},
+          isLoading: true,
         ),
       ),
     );

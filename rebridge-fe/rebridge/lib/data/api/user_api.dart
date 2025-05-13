@@ -1,6 +1,9 @@
 import 'dart:convert';
+import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:http/http.dart' as http;
+import 'package:rebridge/data/api/register_api.dart';
 import 'package:rebridge/shared/address.dart';
 import 'package:rebridge/shared/providers/user_register_provider.dart';
 import 'package:rebridge/shared/utils/dialog_util.dart';
@@ -43,14 +46,75 @@ class UserApi {
     }
   }
 
-  static Future<bool> updateProfileImage(String newImageUrl) async {
+  static Future<String> uploadAndSaveProfileImage(
+      File imageFile, BuildContext context) async {
+    try {
+      // 1. 이미지 업로드
+      final imageUrl = await RegisterApi.uploadImage(imageFile, context);
+      print('이거에요? :$imageUrl');
+      if (imageUrl == null) {
+        DialogUtil.showCustomDialog(
+          context,
+          title: 'Upload Failed',
+          content: 'Image upload failed. Please try again.',
+        );
+        return '';
+      }
+
+      // 2. 이미지 URL 저장
+      final success = await updateProfileImage(imageUrl, context);
+      if (success) {
+        DialogUtil.showCustomDialog(
+          context,
+          title: 'Success',
+          content: 'Profile image has been updated successfully.',
+        );
+        return imageUrl;
+      } else {
+        DialogUtil.showCustomDialog(
+          context,
+          title: 'Save Failed',
+          content: 'Failed to save profile image. Please try again.',
+        );
+        return '';
+      }
+    } catch (e) {
+      print('[UploadAndSaveProfileImage] 예외: $e');
+      DialogUtil.showCustomDialog(
+        context,
+        title: 'Error',
+        content: 'Unexpected error occurred during upload.',
+      );
+      return '';
+    }
+  }
+
+  static Future<bool> updateProfileImage(
+    String newImageUrl,
+    BuildContext context,
+  ) async {
     final headers = await _getHeaders();
+    print('진짜 이건가? : $newImageUrl');
     final response = await http.patch(
       Uri.parse('${Address.baseUrl}/me/profileImage'),
       headers: headers,
       body: jsonEncode({"newImageUrl": newImageUrl}),
     );
-    return response.statusCode == 200;
+    if (response.statusCode == 200) {
+      DialogUtil.showCustomDialog(
+        context,
+        title: 'Change completed',
+        content: 'The Image has been successfully modified.',
+      );
+      return true;
+    } else {
+      DialogUtil.showCustomDialog(
+        context,
+        title: 'Error',
+        content: 'Image change failed. Please try again.',
+      );
+      return false;
+    }
   }
 
   static Future<bool> updatePassword(
@@ -199,4 +263,6 @@ class UserApi {
       return false;
     }
   }
+
+  static uploadImage(File imageFile) {}
 }

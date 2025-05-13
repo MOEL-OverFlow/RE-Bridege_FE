@@ -9,7 +9,6 @@ import 'package:rebridge/shared/providers/user_register_provider.dart';
 import 'package:http/http.dart' as http;
 import 'package:mime/mime.dart';
 import 'package:http_parser/http_parser.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class RegisterApi {
   static Future<bool> sendCode(
@@ -136,7 +135,8 @@ class RegisterApi {
     String? imageUrl;
     if (userData.imagePath != null && userData.imagePath!.isNotEmpty) {
       final imageFile = File(userData.imagePath!);
-      imageUrl = await uploadImage(imageFile);
+      imageUrl = await uploadImage(imageFile, context);
+
       if (imageUrl == null) {
         if (!context.mounted) return false;
         DialogUtil.showCustomDialog(
@@ -148,7 +148,7 @@ class RegisterApi {
       }
     }
 
-    final loginType = userData.password == null || userData.password!.isEmpty
+    final loginType = userData.password == null || userData.password.isEmpty
         ? 'GOOGLE'
         : 'LOCAL';
 
@@ -159,7 +159,7 @@ class RegisterApi {
       "birthDate": userData.birth,
       "foreignerNumber": userData.foreignNumber,
       "nation": userData.nationality,
-      "image": imageUrl ?? "", // 업로드 성공 시 URL, 실패 시 빈 문자열
+      "image": imageUrl ?? "",
       "industry1": userData.primaryIndustry,
       "industry2": userData.secondaryIndustry,
       "loginType": loginType,
@@ -205,11 +205,11 @@ class RegisterApi {
     }
   }
 
-  static Future<String?> uploadImage(File imageFile) async {
+  static Future<String?> uploadImage(
+      File imageFile, BuildContext context) async {
     try {
-      final uri = Uri.parse('${Address.baseUrl}/images/upload');
+      final uri = Uri.parse('${Address.baseUrl}/S3/upload');
       final request = http.MultipartRequest('POST', uri);
-
       final mimeType = lookupMimeType(imageFile.path)?.split('/');
       request.files.add(await http.MultipartFile.fromPath(
         'file',
@@ -221,10 +221,10 @@ class RegisterApi {
 
       final response = await request.send();
       final responseBody = await response.stream.bytesToString();
-
       if (response.statusCode == 200) {
         final json = jsonDecode(responseBody);
-        return json['imageUrl']; // 서버 응답: { "imageUrl": "http://..." }
+        print(json['imageUrl']);
+        return json['imageUrl'];
       } else {
         print('[UploadImage] 실패: ${response.statusCode}, $responseBody');
         return null;

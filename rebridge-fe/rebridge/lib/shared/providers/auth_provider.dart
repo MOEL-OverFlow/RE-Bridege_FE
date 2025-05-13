@@ -21,7 +21,15 @@ class AuthNotifier extends StateNotifier<bool> {
     final prefs = await SharedPreferences.getInstance();
     final saved = prefs.getBool('isLoggedIn') ?? false;
     state = saved;
-
+    final user = await UserApi.getUserInfo();
+    if (user != null) {
+      ref.read(userRegisterProvider.notifier).state = user;
+      print('[AuthNotifier] 사용자 정보 로딩 완료');
+    } else {
+      ref.read(userRegisterProvider.notifier).state = null;
+      print('[AuthNotifier] 사용자 정보 로딩 실패');
+    }
+    print('[AuthNotifier] 초기 로그인 상태: $state');
     print('[AuthNotifier] Initial login state: $state');
   }
 
@@ -81,7 +89,6 @@ class AuthNotifier extends StateNotifier<bool> {
       return null;
     }
 
-    // 토큰이 만료되었는지 확인하고 필요하면 갱신
     try {
       final parts = token.split('.');
       if (parts.length != 3) {
@@ -106,7 +113,6 @@ class AuthNotifier extends StateNotifier<bool> {
         if (refreshed) {
           return prefs.getString('accessToken');
         } else {
-          // 토큰 갱신 실패 시 로그아웃
           await logout();
           return null;
         }
@@ -117,15 +123,6 @@ class AuthNotifier extends StateNotifier<bool> {
     }
 
     return token;
-    final user = await UserApi.getUserInfo();
-    if (user != null) {
-      ref.read(userRegisterProvider.notifier).state = user;
-      print('[AuthNotifier] 사용자 정보 로딩 완료');
-    } else {
-      ref.read(userRegisterProvider.notifier).state = null;
-      print('[AuthNotifier] 사용자 정보 로딩 실패');
-    }
-    print('[AuthNotifier] 초기 로그인 상태: $state');
   }
 
   Future<void> login({
@@ -144,6 +141,7 @@ class AuthNotifier extends StateNotifier<bool> {
     final user = await UserApi.getUserInfo();
     if (user != null) {
       ref.read(userRegisterProvider.notifier).state = user;
+      print(user.imagePath);
       print('[AuthNotifier] User info loaded successfully');
     } else {
       ref.read(userRegisterProvider.notifier).state = null;

@@ -23,8 +23,9 @@ class _FindPwPageState extends State<FindPWPage> {
     final email = emailController.text.trim();
     final name = nameController.text.trim();
     final birth = birthController.text.trim();
+    final registrationNumber = registrationnumberController.text.trim();
 
-    await FindApi.FindPw(email, name, birth, context);
+    await FindApi.FindPw(email, name, birth, registrationNumber, context);
   }
 
   @override

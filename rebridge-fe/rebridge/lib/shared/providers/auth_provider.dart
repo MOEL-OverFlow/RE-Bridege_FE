@@ -1,12 +1,16 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:rebridge/data/api/user_api.dart';
+import 'package:rebridge/shared/providers/user_register_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 final authProvider = StateNotifierProvider<AuthNotifier, bool>(
-  (ref) => AuthNotifier(),
+  (ref) => AuthNotifier(ref),
 );
 
 class AuthNotifier extends StateNotifier<bool> {
-  AuthNotifier() : super(false) {
+  final Ref ref;
+
+  AuthNotifier(this.ref) : super(false) {
     _loadLoginState();
   }
 
@@ -14,7 +18,6 @@ class AuthNotifier extends StateNotifier<bool> {
     final prefs = await SharedPreferences.getInstance();
     final saved = prefs.getBool('isLoggedIn') ?? false;
     state = saved;
-
     print('[AuthNotifier] 초기 로그인 상태: $state');
   }
 
@@ -28,6 +31,15 @@ class AuthNotifier extends StateNotifier<bool> {
     await prefs.setString('refreshToken', refreshToken);
     state = true;
 
+    final user = await UserApi.getUserInfo();
+    if (user != null) {
+      ref.read(userRegisterProvider.notifier).state = user;
+      print('[AuthNotifier] 사용자 정보 로딩 완료');
+    } else {
+      ref.read(userRegisterProvider.notifier).state = null;
+      print('[AuthNotifier] 사용자 정보 로딩 실패');
+    }
+
     print('[AuthNotifier] 로그인 완료 - isLoggedIn: $state');
   }
 
@@ -38,6 +50,7 @@ class AuthNotifier extends StateNotifier<bool> {
     await prefs.remove('refreshToken');
     state = false;
 
+    ref.read(userRegisterProvider.notifier).state = null;
     print('[AuthNotifier] 로그아웃 완료 - isLoggedIn: $state');
   }
 

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:rebridge/data/api/JobPosting_api.dart';
+import 'package:rebridge/shared/providers/user_register_provider.dart';
 import 'package:rebridge/shared/styles/background_styles.dart';
 import 'package:rebridge/shared/styles/button_style.dart';
 import 'package:rebridge/shared/styles/device_styles.dart';
@@ -18,84 +20,44 @@ class HomePage extends ConsumerStatefulWidget {
 class _HomePageState extends ConsumerState<HomePage> {
   final PageController _pageController = PageController(viewportFraction: 0.85);
   int _currentPage = 0;
+  bool isLoading = false;
+  List<Map<String, String>> companySamples = [];
 
-  final List<Map<String, String>> companySamples = [
-    {
-      'name': 'ABC Construction',
-      'field': 'CONSTRUCTION',
-      'country': 'Korea',
-      'recruit': '10',
-      'career': '1+ years',
-      'language': 'Basic',
-      'deadline': '2025-06-30',
-      'url': '',
-      'jobType': 'PRODUCTION_MANAGEMENT',
-      'industryType': 'CONSTRUCTION',
-      'experience': 'ENTRY',
-      'koreanSkill': 'MEDIUM',
-      'bookMark': 'true'
-    },
-    {
-      'name': 'XYZ Electronics',
-      'field': 'ELECTRONIC',
-      'country': 'Vietnam',
-      'recruit': '5',
-      'career': 'Any',
-      'language': 'Intermediate',
-      'deadline': '2025-07-15',
-      'url': '',
-      'jobType': 'INTERPRET',
-      'industryType': 'MANUFACTURING',
-      'experience': 'NONE',
-      'koreanSkill': 'LOW',
-      'bookMark': 'true'
-    },
-    {
-      'name': 'Green Foods',
-      'field': 'FOOD',
-      'country': 'Uzbekistan',
-      'recruit': '3',
-      'career': '2+ years',
-      'language': 'Advanced',
-      'deadline': '2025-06-01',
-      'url': '',
-      'jobType': 'CLERICAL_WORK',
-      'industryType': 'AGRICULTURE_FORESTRY_FISHERY',
-      'experience': 'EXPERIENCED',
-      'koreanSkill': 'HIGH',
-      'bookMark': 'true'
-    },
-    {
-      'name': 'Sky Telecom',
-      'field': 'TELECOMMUNICATIONS',
-      'country': 'Nepal',
-      'recruit': '4',
-      'career': 'Any',
-      'language': 'Basic',
-      'deadline': '2025-06-20',
-      'url': '',
-      'jobType': 'BUSINESS_MANAGEMENT',
-      'industryType': 'MEDIA_COMMUNICATION',
-      'experience': 'NONE',
-      'koreanSkill': 'MEDIUM',
-      'bookMark': 'true'
-    },
-    {
-      'name': 'Ocean Fishery',
-      'field': 'FISHERY',
-      'country': 'Thailand',
-      'recruit': '8',
-      'career': '3+ years',
-      'language': 'Intermediate',
-      'deadline': '2025-08-10',
-      'url': '',
-      'jobType': 'PRODUCTION_MANAGEMENT',
-      'industryType': 'FISHERY',
-      'experience': 'EXPERIENCED',
-      'koreanSkill': 'LOW',
-      'bookMark': 'false'
-    },
-  ];
+  @override
+  void initState() {
+    super.initState();
+    _loadJobPostings();
+  }
+
+  Future<void> _loadJobPostings() async {
+    try {
+      final jobPostings = await JobPostingApi.fetchRandomJob();
+      // print(jobPostings);
+      List<Map<String, String>> converted = jobPostings.map((job) {
+        return {
+          'name': job.companyName,
+          'field': job.field,
+          'country': job.nation,
+          'recruit': job.recruitmentCount.toString(),
+          'career': job.experience,
+          'language': job.koreanSkillLevel,
+          'deadline': job.deadline,
+          'url': job.detailUrl,
+          'jobType': job.jobType,
+          'industryType': job.industryType,
+          'experience': job.experience,
+          'koreanSkill': job.koreanSkillLevel,
+          'bookMark': job.isBookmark.toString(),
+        };
+      }).toList();
+      setState(() {
+        companySamples = converted;
+        isLoading = false;
+      });
+    } catch (e) {
+      debugPrint('Failed to load job postings: $e');
+    }
+  }
 
   @override
   void dispose() {
@@ -142,8 +104,9 @@ class _HomePageState extends ConsumerState<HomePage> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     GestureDetector(
-                        onTap: () => context.push('/mypage'),
-                        child: _buildProfileCard(context, isLoading: true)),
+                      onTap: () => context.push('/mypage'),
+                      child: _buildProfileCard(context, ref),
+                    ),
                     SizedBox(height: DeviceStyles.screenHeight(context) * 0.03),
                     const Text(
                       'Recommended Job Postings',
@@ -152,48 +115,57 @@ class _HomePageState extends ConsumerState<HomePage> {
                     SizedBox(height: DeviceStyles.screenHeight(context) * 0.01),
                     SizedBox(
                       height: DeviceStyles.screenHeight(context) * 0.43,
-                      child: Column(
-                        children: [
-                          Expanded(
-                            child: PageView.builder(
-                              controller: _pageController,
-                              itemCount: companySamples.length,
-                              onPageChanged: (index) {
-                                setState(() => _currentPage = index);
-                              },
-                              itemBuilder: (context, index) {
-                                return Padding(
-                                  padding:
-                                      const EdgeInsets.symmetric(horizontal: 6),
-                                  child: CompanyCard(
-                                      company: companySamples[index],
-                                      isLoading: false),
-                                );
-                              },
-                            ),
-                          ),
-                          const SizedBox(height: 8),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: List.generate(
-                              companySamples.length,
-                              (index) => AnimatedContainer(
-                                duration: const Duration(milliseconds: 300),
-                                margin:
-                                    const EdgeInsets.symmetric(horizontal: 4),
-                                width: _currentPage == index ? 12 : 8,
-                                height: _currentPage == index ? 12 : 8,
-                                decoration: BoxDecoration(
-                                  color: _currentPage == index
-                                      ? const Color(0xFF729BFF)
-                                      : Colors.grey.shade400,
-                                  shape: BoxShape.circle,
+                      child: isLoading
+                          ? _buildLoadingCards()
+                          : companySamples.isEmpty
+                              ? const Center(
+                                  child: Text('No job postings available.'))
+                              : Column(
+                                  children: [
+                                    Expanded(
+                                      child: PageView.builder(
+                                        controller: _pageController,
+                                        itemCount: companySamples.length,
+                                        onPageChanged: (index) {
+                                          setState(() => _currentPage = index);
+                                        },
+                                        itemBuilder: (context, index) {
+                                          return Padding(
+                                            padding: const EdgeInsets.symmetric(
+                                                horizontal: 6),
+                                            child: CompanyCard(
+                                              company: companySamples[index],
+                                              isLoading: false,
+                                            ),
+                                          );
+                                        },
+                                      ),
+                                    ),
+                                    const SizedBox(height: 8),
+                                    Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: List.generate(
+                                        companySamples.length,
+                                        (index) => AnimatedContainer(
+                                          duration:
+                                              const Duration(milliseconds: 300),
+                                          margin: const EdgeInsets.symmetric(
+                                              horizontal: 4),
+                                          width: _currentPage == index ? 12 : 8,
+                                          height:
+                                              _currentPage == index ? 12 : 8,
+                                          decoration: BoxDecoration(
+                                            color: _currentPage == index
+                                                ? const Color(0xFF729BFF)
+                                                : Colors.grey.shade400,
+                                            shape: BoxShape.circle,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
                                 ),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
                     ),
                     SizedBox(height: DeviceStyles.screenHeight(context) * 0.03),
                     _buildButtons(context, ref),
@@ -211,7 +183,10 @@ class _HomePageState extends ConsumerState<HomePage> {
     );
   }
 
-  Widget _buildProfileCard(BuildContext context, {bool isLoading = false}) {
+  Widget _buildProfileCard(BuildContext context, WidgetRef ref,
+      {bool isLoading = false}) {
+    final user = ref.watch(userRegisterProvider);
+
     return Container(
       width: double.infinity,
       padding: EdgeInsets.all(DeviceStyles.screenWidth(context) * 0.03),
@@ -237,9 +212,15 @@ class _HomePageState extends ConsumerState<HomePage> {
                   CircleAvatar(
                     radius: DeviceStyles.screenWidth(context) * 0.08,
                     backgroundColor: const Color(0xFFE6EEFF),
-                    child: Icon(Icons.person,
-                        size: DeviceStyles.screenWidth(context) * 0.08,
-                        color: Colors.grey),
+                    backgroundImage:
+                        isLoading || user?.imagePath.isEmpty != false
+                            ? null
+                            : NetworkImage(user!.imagePath),
+                    child: (isLoading || user?.imagePath.isEmpty != false)
+                        ? Icon(Icons.person,
+                            size: DeviceStyles.screenWidth(context) * 0.08,
+                            color: Colors.grey)
+                        : null,
                   ),
                   SizedBox(height: DeviceStyles.screenHeight(context) * 0.01),
                   Row(
@@ -251,7 +232,7 @@ class _HomePageState extends ConsumerState<HomePage> {
                       isLoading
                           ? const SkeletonLine(width: 80, height: 14)
                           : Text(
-                              'Full Name',
+                              user?.fullName ?? '이름 없음',
                               style: TextStyle(
                                 fontWeight: FontWeight.bold,
                                 fontSize:
@@ -268,7 +249,7 @@ class _HomePageState extends ConsumerState<HomePage> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Industry of Interest',
+                      'Industry of interest',
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: DeviceStyles.screenWidth(context) * 0.04,
@@ -284,17 +265,31 @@ class _HomePageState extends ConsumerState<HomePage> {
                               SkeletonLine(width: 80, height: 10),
                             ],
                           )
-                        : const Column(
+                        : Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text('1. industry 1'),
-                              Text('2. industry 2'),
+                              Text('1. ${user?.primaryIndustry ?? '없음'}'),
+                              Text('2. ${user?.secondaryIndustry ?? '없음'}'),
                             ],
                           ),
                   ],
                 ),
               )
             ],
+          ),
+          SizedBox(height: DeviceStyles.screenHeight(context) * 0.02),
+          Align(
+            alignment: Alignment.centerLeft,
+            child: isLoading
+                ? const SkeletonLine(width: 120, height: 14)
+                : Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text('📧 Email: ${user?.email ?? '없음'}'),
+                      Text('🎂 Birth: ${user?.birth ?? '없음'}'),
+                      Text('🌏 Nation: ${user?.nationality ?? '없음'}'),
+                    ],
+                  ),
           ),
           SizedBox(height: DeviceStyles.screenHeight(context) * 0.02),
           SizedBox(
@@ -341,7 +336,7 @@ class _HomePageState extends ConsumerState<HomePage> {
                   BorderRadius.circular(ButtonStyles.borderradius(context)),
             ),
           ),
-          child: const Text('채용 공고'),
+          child: const Text('Job Postings'),
         ),
         ElevatedButton(
           onPressed: () {
@@ -359,7 +354,7 @@ class _HomePageState extends ConsumerState<HomePage> {
                   BorderRadius.circular(ButtonStyles.borderradius(context)),
             ),
           ),
-          child: const Text('체크리스트'),
+          child: const Text('CheckLists'),
         )
       ],
     );
@@ -404,6 +399,19 @@ class _HomePageState extends ConsumerState<HomePage> {
               ),
             )
           ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildLoadingCards() {
+    return PageView.builder(
+      itemCount: 3,
+      itemBuilder: (context, index) => const Padding(
+        padding: EdgeInsets.symmetric(horizontal: 6),
+        child: CompanyCard(
+          company: {}, // 빈 값
+          isLoading: true, // 스켈레톤 활성화
         ),
       ),
     );

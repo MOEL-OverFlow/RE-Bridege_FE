@@ -69,10 +69,39 @@ class JobPostingApi {
 
     if (response.statusCode == 200) {
       final List<dynamic> data = jsonDecode(response.body);
-      print(response.body);
+      // print(response.body);
       return data.map((e) => JobPosting.fromJson(e)).toList();
     } else {
       throw Exception('Failed to load job postings: ${response.body}');
+    }
+  }
+
+  static Future<List<JobPosting>> fetchRandomJob() async {
+    final prefs = await SharedPreferences.getInstance();
+    final accessToken = prefs.getString('accessToken');
+
+    if (accessToken == null) {
+      throw Exception('Access token not found. Please log in again.');
+    }
+
+    final response = await http.get(
+      Uri.parse('${Address.baseUrl}/job-postings/recommend'),
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $accessToken',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      final List<dynamic> data = jsonDecode(response.body);
+      // print('[JobPostingApi] 추천 공고 불러오기 성공');
+      print(response.body);
+      return data.map((e) => JobPosting.fromJson(e)).toList();
+    } else {
+      // print(
+      //     '[JobPostingApi] 추천 공고 실패: ${response.statusCode} / ${response.body}');
+      throw Exception(
+          'Failed to load recommended job postings: ${response.body}');
     }
   }
 }

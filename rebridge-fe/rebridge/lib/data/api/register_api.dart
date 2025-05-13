@@ -129,6 +129,11 @@ class RegisterApi {
       );
       return false;
     }
+
+    final loginType = userData.password == null || userData.password!.isEmpty
+        ? 'GOOGLE'
+        : 'LOCAL';
+
     print('------ 회원가입 최종 데이터 ------');
     print('Email: ${userData.email}');
     print('Password: ${userData.password}');
@@ -139,6 +144,7 @@ class RegisterApi {
     print('Primary Industry: ${userData.primaryIndustry}');
     print('Secondary Industry: ${userData.secondaryIndustry}');
     print('Image Path: ${userData.imagePath}');
+    print('Login Type: $loginType');
     print('--------------------------------');
 
     final body = {
@@ -151,6 +157,7 @@ class RegisterApi {
       "image": userData.imagePath,
       "industry1": userData.primaryIndustry,
       "industry2": userData.secondaryIndustry,
+      "loginType": loginType,
     };
 
     try {
